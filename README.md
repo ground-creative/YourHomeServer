@@ -57,8 +57,11 @@ npm install tuyacloudnodejs
 ## Main endpoints
 
 Actions are found in the schema file.
+
 Cloud types are "scenes|devices|home|token"
+
 Use get-methods as a method to see all the cloud types methods available.
+
 
 Run an action on a device, 
 http:serveraddress:port/local/device/{label}/?actions={actions}&values={values}
