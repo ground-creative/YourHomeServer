@@ -58,22 +58,23 @@ npm install tuyacloudnodejs
 
 Actions are found in the schema file.\
 Cloud types are "scenes|devices|home|token"\
-Use get-methods as a method to see all the cloud types methods available.\
+Use get-methods as a method to see all the cloud types methods available
 
-
-Run an action on a device, 
+Run an action on a device\
 http:serveraddress:port/local/device/{label}/?actions={actions}&values={values}
 
-Run a scene, 
+Run a scene\ 
 http:serveraddress:port/local/scene/{name}/
 
-Query a scene
+Query a scene\
 http:serveraddress:port/local/query/{name}/
 
-Evaluate a condition
+Evaluate a condition\
 http:serveraddress:port/local/eval/{name}/
 
-Direct cloud requests
+Direct cloud requests\
 http:serveraddress:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
+
+
 
 *** Cloud support is only for tuya devices at the moment.
