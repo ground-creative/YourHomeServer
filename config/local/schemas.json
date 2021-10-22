@@ -1,0 +1,57 @@
+{
+	"tuya":
+	{
+		"dj":
+		{
+			"switch": 20 ,
+			"brightness": 22 ,
+			"work_mode": 21 ,
+			"temperature": 23
+		} ,
+		"cz":
+		{
+			"switch": 1
+		} ,
+		"wnykq":
+		{
+			"temp": 101 ,
+			"hum": 102
+		} ,
+		"sp": { } ,
+		"wg2":
+		{ 
+			"master_state": 32 ,
+			"switch_alarm_sound": 4
+		} ,
+		"scene": { }
+	} ,
+	"miio":
+	{
+		"dj":
+		{
+			"switch": { "siid": 2 , "piid": 1 } ,
+			"brightness": { "siid": 2 , "piid": 3 }
+		} ,
+		"humidifier":
+		{
+			"switch": { "siid": 2 , "piid": 1 } ,
+			"device_fault": { "siid": 2 , "piid": 2 } ,
+			"mode": { "siid": 2 , "piid": 3 } ,
+			"target_humidity": { "siid": 2 , "piid": 5 } ,
+			"fan_level": { "siid": 2 , "piid": 7 } ,
+			"relative_humidity": { "siid": 3 , "piid": 1 } ,
+			"temperature": { "siid": 3 , "piid": 7 } ,
+			"buzzer": {"siid": 4, "piid": 1} ,
+			"indicator_light": { "siid": 5 , "piid": 1 } ,
+			"child_lock": {"siid": 6, "piid": 1} ,
+			"water_shortage_fault": { "siid": 7 , "piid": 1 } ,
+			"compressor_on": { "siid": 7 , "piid": 2 } ,
+			"tank_full": { "siid":7, "piid": 3 } ,
+			"clean_mode": {"siid": 7, "piid": 4}
+		}
+	} ,
+	"_categories":
+	{
+		"_dj":"light","_cz":"fan","_wnykq":"ir","_sp":"camera"
+	}
+}
