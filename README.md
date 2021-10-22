@@ -14,8 +14,7 @@ git rm --cached config/conditions.json &&
 git rm --cached config/config.json &&
 git rm --cached config/scenes.json &&
 git rm --cached config/local/devices.json &&
-git rm --cached package.json &&
-git rm --cached package-lock.json
+git rm --cached package.json
 
 git reset
 
