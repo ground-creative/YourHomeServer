@@ -1,0 +1,4 @@
+package.json
+package-lock.json
+/config/devices.json
+/node_modules/
