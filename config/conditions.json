@@ -1,0 +1,41 @@
+{
+	"lr-check-lights":
+	{
+		"conditions":
+		[
+			{
+				"label":"lr-light1" ,
+				"eval": "switch=true" ,
+				"or":
+				[
+					{
+						"label":"lr-light2" ,
+						"eval": "switch=true"
+					} ,
+					{
+						"label":"lr-light3" ,
+						"eval": "switch=true"
+					}
+				]
+			}
+		] 
+	} ,
+	"lr-lights-on":
+	{
+		"conditions":
+		[
+			{
+				"label":"lr-light1" ,
+				"eval": "switch=false"
+			} ,
+			{
+				"label":"lr-light2" ,
+				"eval": "switch=false"
+			} ,
+			{
+				"label":"lr-light3" ,
+				"eval": "switch=false"
+			}
+		] 
+	}
+}

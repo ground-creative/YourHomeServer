@@ -1,0 +1,13 @@
+{
+	"rawai":
+	{
+		"secretKey" : "51a86a77918c45d2b2ab7662283d50e1" ,
+		"accessKey" : "pn3y75qaaxxn70xofnd9" ,
+		"appKey": "az16315288573659A23C" ,
+		"homeID": "49929190" ,
+		"uid": "az16315288573659A23C" ,
+		"server": "https://openapi.tuyaus.com" ,
+		"type": "tuya" ,
+		"user_id": ""
+	}
+}

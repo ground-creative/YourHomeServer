@@ -1,0 +1,208 @@
+{
+	"penguin-on":
+	{
+		"penguin-plug":
+		{
+			"actions": "on"
+		} ,
+		"sc-penguin-power-toggle":
+		{
+			"type":"cloud" ,
+			"config": "rawai" ,
+			"actions": "" ,
+			"values": ""
+		}
+	} ,
+	"penguin-swing":
+	{
+		"sc-penguin-swing":
+		{
+			"type":"cloud" ,
+			"config": "rawai" ,
+			"actions": "" ,
+			"values": ""
+		}
+	} ,
+	"penguin-speed":
+	{
+		"sc-penguin-speed":
+		{
+			"type":"cloud" ,
+			"config": "rawai" ,
+			"actions": "" ,
+			"values": ""
+		}
+	} ,
+	"i-am-home":
+	{
+		"lr-light1":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "25^10"
+		} ,
+		"lr-light2":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "25^10"
+		} ,
+		"lr-light3":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "25^10"
+		} ,
+		"lr-fan":
+		{
+			"actions": "on"
+		}
+	} ,
+	"i-am-away":
+	{
+		"lr-light1":
+		{
+			"actions": "off"
+		} ,
+		"lr-light2":
+		{
+			"actions": "off"
+		} ,
+		"lr-light3":
+		{
+			"actions": "off"
+		} ,
+		"lr-fan":
+		{
+			"actions": "off"
+		}
+	} ,
+	"lights-on-in-evening":
+	{
+		"lr-light1":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "25^10"
+		} ,
+		"lr-light2":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "25^10"
+		} ,
+		"lr-light3":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "25^10"
+		}
+	} ,
+	"lights-off-in-morning":
+	{
+		"lr-light1":
+		{
+			"actions": "off"
+		} ,
+		"lr-light2":
+		{
+			"actions": "off"
+		} ,
+		"lr-light3":
+		{
+			"actions": "off"
+		} ,
+		"lr-lamp":
+		{
+			"actions": "off"
+		}
+	} ,
+	"fd-light-on":
+	{
+		"fd-light":
+		{
+			"actions": "brightness^on" ,
+			"values": "25"
+		}
+	} ,
+	"lr-lights-on":
+	{
+		"lr-light1":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "10^10"
+		} ,
+		"lr-light2":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "10^10"
+		} ,
+		"lr-light3":
+		{
+			"actions": "brightness^temperature^on" ,
+			"values": "10^10"
+		}
+	} ,
+	"lr-lights-off":
+	{
+		"lr-light1":
+		{
+			"actions": "off"
+		} ,
+		"lr-light2":
+		{
+			"actions": "off"
+		} ,
+		"lr-light3":
+		{
+			"actions": "off"
+		}
+	}  ,
+	"air-values":
+	{
+		"lr-ir":
+		{
+			"actions": "info"
+		} ,
+		"mb-ir":
+		{
+			"actions": "info"
+		} ,
+		"mb-humidifier":
+		{
+			"actions": "info"
+		}
+	} ,
+	"bhr-fan-start-countdown":
+	{
+		"bhr-fan":
+		{
+			"type":"cloud" ,
+			"config": "rawai" ,
+			"actions": "countdown_1" ,
+			"values": "120"
+		}
+	} ,
+	"bhr-fan-turn-on":
+	{
+		"bhr-fan":
+		{
+			"actions": "on"
+		} ,
+		"bhr-fan-cloud":
+		{
+			"type":"cloud" ,
+			"config": "rawai" ,
+			"actions": "countdown_1" ,
+			"values": "0"
+		}
+	} ,
+	"br-fan-routine":
+	{
+		"br-fan":
+		{
+			"actions": "on"
+		} ,
+		"br-fan-cloud":
+		{
+			"type":"cloud" ,
+			"config": "rawai" ,
+			"actions": "countdown_1" ,
+			"values": "1800"
+		} 
+	}
+}
