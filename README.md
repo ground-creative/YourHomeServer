@@ -9,10 +9,21 @@ git clone https://github.com/ifsale/YourHomeServer.git
 
 cd YourHomeServer
 
-git rm --cached package.json
+git rm --cached config/cloud.json &&
+git rm --cached config/conditions.json &&
+git rm --cached config/config.json &&
+git rm --cached config/scenes.json &&
+git rm --cached config/local/devices.json &&
+git rm --cached package.json &&
+git rm --cached package-lock.json
 
 git reset
 
+git update-index --assume-unchanged config/local/devices.json &&
+git update-index --assume-unchanged config/cloud.json &&
+git update-index --assume-unchanged config/scenes.json &&
+git update-index --assume-unchanged config/conditions.json &&
+git update-index --assume-unchanged config/config.json &&
 git update-index --assume-unchanged package.json
 
 npm install
