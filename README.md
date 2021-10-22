@@ -63,7 +63,7 @@ Use get-methods as a method to see all the cloud types methods available
 Run an action on a device\
 http:serveraddress:port/local/device/{label}/?actions={actions}&values={values}
 
-Run a scene\ 
+Run a scene\
 http:serveraddress:port/local/scene/{name}/
 
 Query a scene\
