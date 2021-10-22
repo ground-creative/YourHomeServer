@@ -40,18 +40,27 @@ node app.js
 
 ```
 npm install codetheweb/tuyapi
+
+git rm -r --cached --ignore-unmatch node_modules &&
+git clean -fdx
 ```
 
 ## Miio local module
 
 ```
 npm install miio-api
+
+git rm -r --cached --ignore-unmatch node_modules &&
+git clean -fdx
 ```
 
 ## Tuya cloud module
 
 ```
 npm install tuyacloudnodejs
+
+git rm -r --cached --ignore-unmatch node_modules &&
+git clean -fdx
 ```
 
 ## Main endpoints
