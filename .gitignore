@@ -1,4 +1,8 @@
 package.json
 package-lock.json
-/config/devices.json
+/config/local/devices.json
+/config/conditions.json
+/config/config.json
+/config/cloud.json
+/config/cloud.json
 /node_modules/
