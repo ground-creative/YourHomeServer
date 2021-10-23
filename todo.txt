@@ -1,3 +1,0 @@
-add smartthings cloud support
-add conditions cloud support
-compress code
