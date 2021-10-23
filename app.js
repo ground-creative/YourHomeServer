@@ -209,65 +209,75 @@ app.get( '/local/query/:name' , ( req , res ) =>
 	( async function( )
 	{
 		let body = { };
-		for ( const key in scenes[ name ] )
+		try
 		{
-			let actions = scenes[ name ][ key ].actions;	
-			let data = '';
-			if ( scenes[ name ][ key ].type == 'cloud' )
+			for ( const key in scenes[ name ] )
 			{
-				if ( !token )
+				let actions = scenes[ name ][ key ].actions;	
+				let data = '';
+				if ( scenes[ name ][ key ].type == 'cloud' )
 				{
-					token = await cloudController.getToken( devices[ key ].type , cloudConfig[ scenes[ name ][ key ].config ] );
-				}
-				actions = actions.split( '^' );
-				let query = await cloudController.deviceData( token , key , actions , '' , cloudConfig[ scenes[ name ][ key ].config ] );
-				if ( actions == "info" )
-				{
-					data = Object.assign( { } , query.result );
-					for ( const k in data )
+					if ( !token )
 					{
-						data[ data[ k ].code ] = data[ k ].value;
+						token = await cloudController.getToken( devices[ key ].type , cloudConfig[ scenes[ name ][ key ].config ] );
 					}
-				}
-				else
-				{
-					data = { };
-					for ( const k in actions )
-					{
-						for ( const key of query.result  )
-						{
-							if ( key.code == actions[ k ] )
-							{
-								data[ actions[ k ] ] = key.value;
-							}
-							
-						}
-					}
-				}
-			}
-			else
-			{
-				let query = await getData( key );
-				if ( actions == "info" )
-				{
-					data =  JSON.parse( query ).result.data;
-				}
-				else
-				{
-					data = {};
 					actions = actions.split( '^' );
-					let values = JSON.parse( query );
-					for ( const k in actions )
+					let query = await cloudController.deviceData( token , key , actions , '' , cloudConfig[ scenes[ name ][ key ].config ] );
+					if ( actions == "info" )
 					{
-						val = ( actions[ k ] == 'off' || actions[ k ] == 'on' ) ? 'switch' : actions[ k ];
-						if ( values.result.data.hasOwnProperty( actions[ k ] ) )
+						data = Object.assign( { } , query.result );
+						for ( const k in data )
 						{
-							data[ val ] = values.result.data[ val ];
+							data[ data[ k ].code ] = data[ k ].value;
+						}
+					}
+					else
+					{
+						data = { };
+						for ( const k in actions )
+						{
+							for ( const key of query.result  )
+							{
+								if ( key.code == actions[ k ] )
+								{
+									data[ actions[ k ] ] = key.value;
+								}
+								
+							}
 						}
 					}
 				}
+				else
+				{
+					let query = await getData( key );
+					if ( actions == "info" )
+					{
+						data =  JSON.parse( query ).result.data;
+					}
+					else
+					{
+						data = {};
+						actions = actions.split( '^' );
+						let values = JSON.parse( query );
+						for ( const k in actions )
+						{
+							val = ( actions[ k ] == 'off' || actions[ k ] == 'on' ) ? 'switch' : actions[ k ];
+							if ( values.result.data.hasOwnProperty( actions[ k ] ) )
+							{
+								data[ val ] = values.result.data[ val ];
+							}
+						}
+					}
+				}
+				body[ key ]= data;		
 			}
-			body[ key ]= data;		
+		}
+		catch( error )
+		{
+			let msg = "Query scene " + name + " " + error;
+			req.logger.error( msg );
+			result = req.resHandler.payload( true , -14 , msg , {} );
+			return res.status( 500 ).end( result );
 		}
 		req.logger.msg( "Scene '" + name + "' query result" , body );
 		result = req.resHandler.payload( true , 200 , "Scene '" + name + "' query result" , body );
