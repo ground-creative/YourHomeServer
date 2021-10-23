@@ -48,10 +48,21 @@
 			"compressor_on": { "siid": 7 , "piid": 2 } ,
 			"tank_full": { "siid":7, "piid": 3 } ,
 			"clean_mode": {"siid": 7, "piid": 4}
-		}
+		} ,
+		"scene": { }
+	} ,
+	"smartthings":
+	{
+		"tv":
+		{ 
+			"volume": { "command": "setVolume" , "capability": "audioVolume" } ,
+			"switch_on": { "command": "on" , "capability": "switch" } ,
+			"switch_off": { "command": "off" , "capability": "switch" }
+		} ,
+		"scene": { }
 	} ,
 	"_categories":
 	{
-		"_dj":"light","_cz":"fan","_wnykq":"ir","_sp":"camera"
+		"_dj":"light","_cz":"fan","_wnykq":"ir","_sp":"camera","_tv":"television"
 	}
 }

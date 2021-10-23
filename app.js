@@ -142,11 +142,20 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 			let values = ( vals ) ? vals.split( '^' ) : '';
 			if ( scenes[ name ][ key ].hasOwnProperty( 'type' ) && scenes[ name ][ key ].type == 'cloud' )
 			{
-				if ( !token )
+				
+				if ( devices[ label ].type == 'tuya' )
 				{
-					token = await cloudController.getToken( devices[ label ].type , cloudConfig[ scenes[ name ][ key ].config ] );
+					if ( !token )
+					{
+						token = await cloudController.getToken( devices[ label ].type , cloudConfig[ scenes[ name ][ key ].config ] );
+					}
+					cloudController.tuya( token , label , actions , values , cloudConfig[ scenes[ name ][ key ].config ] );
 				}
-				cloudController.run( token , label , actions , values , cloudConfig[ scenes[ name ][ key ].config ] );
+				else if ( devices[ label ].type == 'smartthings' )
+				{
+					cloudController.smartthings( label , actions , values , 
+						cloudConfig[ scenes[ name ][ key ].config ] , schema , scenes[ name ][ key ].component );
+				}
 			}
 			else
 			{
@@ -523,13 +532,17 @@ app.get( '/cloud/:engine/:type/:label' , ( req , res ) =>
 	return false;
 } );
 
-app.all( '/cloud/:engine/:type/:label/:request/:thingID?' , ( req , res ) => 
+app.all( [ '/cloud/:engine/:type/:label/:request/:thingID?' ,  
+		'/cloud/:engine/:type/:label/:request/:thingID/:componentID?' , 
+		'/cloud/:engine/:type/:label/:request/:thingID/:componentID/:capabilityID?' ] , ( req , res ) => 
 {
 	let request = req.params.request;
 	let type = req.params.type;
 	let label = req.params.label;
 	let engine = req.params.engine;
 	let thing_id = req.params.thingID;
+	let component_id = req.params.componentID;
+	let capability_id = req.params.capabilityID;
 	let types = [ 'home' , 'scenes' , 'token' , 'devices' ];
 	if ( !types.includes( type ))
 	{
@@ -604,6 +617,46 @@ app.all( '/cloud/:engine/:type/:label/:request/:thingID?' , ( req , res ) =>
 			data = JSON.stringify( data );
 			res.status( 200 ).end( data );
 			//res.end( data );
+		} )( );
+	}
+	else if ( engine == 'smartthings' )
+	{
+		let SmartThings = require( './smartthings/SmartThings' );
+		let engine = new SmartThings( config[ label ] );
+		let endpoints = engine[ type ]( )._endpoints;
+		request = request.replace( new RegExp(/-/, 'g' ) , '_' );
+		if ( !endpoints.hasOwnProperty( request ) )
+		{
+			let msg = "Invalid endpoint '" + request + "'";
+			req.logger.error( msg );
+			result = req.resHandler.payload( false , -12 , msg , { "endpoints list": endpoints } );
+			res.header( 'Content-Type' , 'application/json' );
+			res.status( 500 ).send( result );
+			return false;
+		}
+		let uri = endpoints[ request ];
+		if ( thing_id )
+		{
+			let devs = fs.readFileSync( './config/local/devices.json' );
+			let devices = JSON.parse( devs );
+			if ( devices.hasOwnProperty( thing_id ) )
+			{
+				thing_id = devices[ thing_id ].id;
+			}
+		}
+		uri = uri.replace( '{device_id}' , thing_id );
+		uri = uri.replace( '{component_id}' , component_id );
+		uri = uri.replace( '{capability_id}' , capability_id );
+		( async function( ) 
+		{
+			let requestHandler = engine._dependencies.Request( config[ label ] , engine._dependencies );
+			let payload = ( Object.keys( req.body ).length !== 0 ) ? req.body : '';
+			req.logger.cloud( "Starting smartthings cloud request " + request + ' ' + req.method + ' => ' + uri , payload );
+			data = await requestHandler.call( uri , req.method , payload );
+			req.logger.cloud( "Finished smartthings cloud request " + req.method + ' => ' + uri  , data );
+			res.header( 'Content-Type' , 'application/json' );
+			data = JSON.stringify( data );
+			res.status( 200 ).end( data );
 		} )( );
 	}
 	else
