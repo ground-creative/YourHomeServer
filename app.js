@@ -621,7 +621,7 @@ app.all( [ '/cloud/:engine/:type/:label/:request/:thingID?' ,
 	}
 	else if ( engine == 'smartthings' )
 	{
-		let SmartThings = require( './smartthings/SmartThings' );
+		let SmartThings = require( 'smartthingsnodejs' );
 		let engine = new SmartThings( config[ label ] );
 		let endpoints = engine[ type ]( )._endpoints;
 		request = request.replace( new RegExp(/-/, 'g' ) , '_' );
