@@ -124,6 +124,13 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 	{
 		for ( const key in scenes[ name ] )
 		{
+			if ( key == 'wait' )
+			{
+				req.logger.simple( 'Waiting ' + scenes[ name ][ key ] + ' milliseconds' );
+				await new Promise( resolve => setTimeout ( resolve , scenes[ name ][ key ] ) );
+				req.logger.simple( 'Finished waiting ' + scenes[ name ][ key ] + ' milliseconds' );
+				continue;
+			}
 			let label = key;
 			let schema = params.schema( label , schemas , devices );
 			if ( !schema )

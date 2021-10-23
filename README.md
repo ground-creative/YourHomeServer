@@ -1,6 +1,6 @@
 # YourHomeServer
 
-nodejs server based on express module to control tuya and miio devices locally or over the cloud (tuya cloud support only for now)
+nodejs server based on express module to control tuya and miio devices locally or over the cloud
 
 ## Installation and start server
 
@@ -72,4 +72,4 @@ http:serveraddress:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method
 
 
 
-*** Cloud support is only for tuya devices at the moment.
+*** Cloud support is only available for tuya devices at the moment.
