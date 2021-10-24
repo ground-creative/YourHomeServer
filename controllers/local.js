@@ -25,6 +25,26 @@ module.exports = function ( req , res , devices )
 			var result = req.resHandler.payload( false , -5 , msg , {} );
 			req.response.output( result );
 		}
-	}
+	};
+	
+	module.request = function( url )
+	{
+		return new Promise( function( resolve , reject ) 
+		{
+			req.reqHandler( { "uri": url , "method": "GET" } , function ( error , res , body ) 
+			{
+				if ( !error ) 
+				{
+					resolve( body );
+				} 
+				else 
+				{
+					resolve( error );
+					//reject( error );
+				}
+			} );
+		} );
+	};
+	
 	return module;
 };

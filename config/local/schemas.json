@@ -56,9 +56,18 @@
 		"tv":
 		{ 
 			"volume": { "command": "setVolume" , "capability": "audioVolume" } ,
+			"volumeDown": { "command": "volumeDown" , "capability": "audioVolume" } ,
+			"volumeUp": { "command": "volumeUp" , "capability": "audioVolume" } ,
+			"switch": { "command": "" , "capability": "switch" } ,
+			"mute": { "command": "mute" , "capability": "audioMute" } ,
+			"unmute": { "command": "unmute" , "capability": "audioMute" } ,
+			"setMute": { "command": "setMute" , "capability": "audioMute" } ,
 			"switch_on": { "command": "on" , "capability": "switch" } ,
-			"switch_off": { "command": "off" , "capability": "switch" }
-		} ,
+			"switch_off": { "command": "off" , "capability": "switch" } ,
+			"inputSource":{ "command": "setInputSource" , "capability": "mediaInputSource" } ,
+			"playbackStatus":{ "command": "setPlaybackStatus" , "capability": "mediaPlayback" } ,
+			"presets":{ "command": "playPreset" , "capability": "mediaPresets" }
+		} , 
 		"scene": { }
 	} ,
 	"_categories":

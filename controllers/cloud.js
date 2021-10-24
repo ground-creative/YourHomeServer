@@ -1,11 +1,33 @@
-const TuyaCloud = require( 'tuyacloudnodejs' );
-
 module.exports = function ( req , res , devices )
 {
 	let module = { };
 	
-	module.tuya = async function( token , label , actions , values , config )
+	module._TuyaCLoud = null;
+	
+	module._SmartThings = null;
+	
+	module.getEngine = function( type )
 	{
+		if ( type == 'tuya' )
+		{
+			this._TuyaCLoud = ( this._TuyaCLoud ) ? this._TuyaCLoud  : require( 'tuyacloudnodejs' );
+			return this._TuyaCLoud;
+		}
+		else if ( type == 'smartthings' )
+		{
+			this._SmartThings = ( this._SmartThings ) ? this._SmartThings : require( 'smartthingsnodejs' );
+			return this._SmartThings;
+		}
+		else
+		{
+			req.logger.cloud( "Cloud engine '" + type + "' not supported!" );
+			return false;
+		}
+	}
+	
+	module.executeTuyaCloudScene = async function( token , label , actions , values , config )
+	{
+		let TuyaCloud = this.getEngine( 'tuya' );
 		let Tuya = new TuyaCloud( config );
 		if ( devices[ label ].category == 'scene' )
 		{
@@ -40,10 +62,10 @@ module.exports = function ( req , res , devices )
 		return data;
 	};
 	
-	module.smartthings= async function( label , actions , values , config , schema , component )
+	module.executeSmartThingsScene = async function( label , actions , values , config , schema , component )
 	{
-		let SmartThings = require( 'smartthingsnodejs' );
-		let engine = new SmartThings( config );
+		let Module = this.getEngine( 'smartthings' );
+		let SmartThings = new Module( config );
 		let commands = [ ];
 		if ( devices[ label ].category == 'scene' )
 		{
@@ -82,38 +104,39 @@ module.exports = function ( req , res , devices )
 		}
 		let payload = commands;
 		req.logger.cloud( "Posting SmartThings cloud commands for device '" + label + "'" , payload );
-		data = await engine.devices( ).post_commands( devices[ label ].id , payload );
+		data = await SmartThings.devices( ).post_commands( devices[ label ].id , payload );
 		req.logger.cloud( "Post SmartThings cloud commands result for device '" + label + "'" , data );
 		return data;
 	};
 	
-	module.deviceData = async function( token , label , actions , values , config )
+	module.getTuyaCloudDeviceData = async function( token , label , config )
 	{
-		if ( devices[ label ].type == 'tuya' )
-		{
-			let Tuya = new TuyaCloud( config );
-			req.logger.cloud( "Getting tuya cloud details for device '" + label + "'" );
-			data = await Tuya.devices( token ).get_status( devices[ label ].id );
-			req.logger.cloud( "Tuya cloud details for device '" + label + "'" , data );
-			return data;
-		}
-		return false;
+		let TuyaCloud = this.getEngine( 'tuya' );
+		let Tuya = new TuyaCloud( config );
+		req.logger.cloud( "Getting tuya cloud details for device '" + label + "'" );
+		data = await Tuya.devices( token ).get_status( devices[ label ].id );
+		req.logger.cloud( "Tuya cloud details for device '" + label + "'" , data );
+		return data;
+	};
+		
+	module.getTuyaCloudToken = async function( config )
+	{
+		let TuyaCloud = this.getEngine( 'tuya' );
+		let Tuya = new TuyaCloud( config );
+		req.logger.cloud( "Starting tuya cloud token call" );
+		let data = await Tuya.token( ).get_new( );
+		req.logger.cloud( 'Tuya cloud token call result: ' , data )
+		return ( data.success ) ? data.result.access_token : null;
 	};
 	
-	module.getToken = async function( type , config )
+	module.getSmartThingsDeviceData = async function( label , component , config )
 	{
-		if ( type == 'tuya' )
-		{
-			let Tuya = new TuyaCloud( config );
-			// get a new token
-			req.logger.cloud( "Starting tuya cloud token call" );
-			let data = await Tuya.token( ).get_new( );
-			let d = data;//JSON.parse( data );
-			req.logger.cloud( 'Tuya cloud token call result: ' , data )
-			//return ( ) ? d.result.access_token : false;
-			return d.result.access_token;
-		}
-		return false;
+		let Module = this.getEngine( 'smartthings' );
+		let SmartThings = new Module( config );
+		req.logger.cloud( "Getting SmartThings capabilities for device '" + label + "'" );
+		data = await SmartThings.devices( ).get_component( devices[ label ].id , component );
+		req.logger.cloud( "Tuya SmartThings capabilities for device '" + label + "'" , data );
+		return data;
 	};
 	
 	return module;

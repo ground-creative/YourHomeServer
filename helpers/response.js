@@ -103,12 +103,9 @@ module.exports = function( res )
 					if ( data.result.data[ i ].siid == schema[ key ].siid && 
 								data.result.data[ i ].piid == schema[ key ].piid )
 					{
-						
-						//value[ key ] = data.result.data[ i ].value;
 						data.result.data[ key ] = data.result.data[ i ].value;
 						
 					}
-					//data.result.data.push( value );
 				}
 				i++;
 			}

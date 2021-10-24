@@ -33,6 +33,8 @@ app.use( ( req , res , next ) =>
 	req.session = Math.random( ).toString( 36 ).substring( 2 , 12 );
 	req.logger = require( './helpers/logger' )( req.session );
 	req.resHandler = require( './helpers/response' )( res );
+	req.reqHandler = require( 'request' );
+	req.paramsHandler = require( './helpers/params-handler' )( req , res );
 	req.logger.request( 'Started processing request from ' + 
 				req.socket.remoteAddress + ' => ' + req.url );
 	res.on( 'finish' , function( ) 
@@ -102,65 +104,71 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 	let name = req.params.name;
 	let rt = fs.readFileSync( './config/scenes.json' );
 	let scenes = JSON.parse( rt );
-	if ( !scenes[ name ] )
+	let params = require( './helpers/params-handler' )( req , res );
+	if ( !req.paramsHandler.checkSceneName( name , scenes ) )
 	{
-		let msg = "Abort: '" + name + "' scene does not exist";
-		req.logger.error( msg );
-		result = req.resHandler.payload( false , -10 , msg , {} );
-		res.end( result );
 		return false;
 	}
 	let devs = fs.readFileSync( './config/local/devices.json' );
 	let devices = JSON.parse( devs );
 	let raw = fs.readFileSync( './config/local/schemas.json' );
 	let schemas = JSON.parse( raw );
-	let params = require( './helpers/params-handler' )( req , res );
 	let localController = require( './controllers/local' )( req , res , devices );
 	let cloudController = require( './controllers/cloud' )( req , res , devices );
 	let cloudConfig = JSON.parse( fs.readFileSync( './config/cloud.json' ) );
 	req.resHandler.type = 'scene';
-	let token = '';
 	( async function( )
 	{
-		for ( const key in scenes[ name ] )
+		let token = '';
+		try
 		{
-			if ( key == 'wait' )
+			for ( const key in scenes[ name ] )
 			{
-				req.logger.simple( 'Waiting ' + scenes[ name ][ key ] + ' milliseconds' );
-				await new Promise( resolve => setTimeout ( resolve , scenes[ name ][ key ] ) );
-				req.logger.simple( 'Finished waiting ' + scenes[ name ][ key ] + ' milliseconds' );
-				continue;
-			}
-			let label = key;
-			let schema = params.schema( label , schemas , devices );
-			if ( !schema )
-			{
-				return false;
-			}
-			let actions = scenes[ name ][ key ].actions.split( '^' );
-			let vals = scenes[ name ][ key ].values;
-			let values = ( vals ) ? vals.split( '^' ) : '';
-			if ( scenes[ name ][ key ].hasOwnProperty( 'type' ) && scenes[ name ][ key ].type == 'cloud' )
-			{
-				
-				if ( devices[ label ].type == 'tuya' )
+				if ( key == 'wait' )
 				{
-					if ( !token )
+					req.logger.simple( 'Waiting ' + scenes[ name ][ key ] + ' milliseconds' );
+					await new Promise( resolve => setTimeout ( resolve , scenes[ name ][ key ] ) );
+					req.logger.simple( 'Finished waiting ' + scenes[ name ][ key ] + ' milliseconds' );
+					continue;
+				}
+				let label = key;
+				let schema = req.paramsHandler.schema( label , schemas , devices );
+				if ( !schema )
+				{
+					return false;
+				}
+				let actions = scenes[ name ][ key ].actions.split( '^' );
+				let vals = scenes[ name ][ key ].values;
+				vals = req.paramsHandler.dynamicSceneValues( vals );
+				let values = ( vals ) ? vals.split( '^' ) : '';
+				if ( scenes[ name ][ key ].hasOwnProperty( 'type' ) && scenes[ name ][ key ].type == 'cloud' )
+				{
+					if ( devices[ label ].type == 'tuya' )
 					{
-						token = await cloudController.getToken( devices[ label ].type , cloudConfig[ scenes[ name ][ key ].config ] );
+						if ( !token )
+						{
+							token = await cloudController.getToken( devices[ label ].type , cloudConfig[ scenes[ name ][ key ].config ] );
+						}
+						cloudController.executeTuyaCloudScene( token , label , actions , values , cloudConfig[ scenes[ name ][ key ].config ] );
 					}
-					cloudController.tuya( token , label , actions , values , cloudConfig[ scenes[ name ][ key ].config ] );
+					else if ( devices[ label ].type == 'smartthings' )
+					{
+						cloudController.executeSmartThingsScene( label , actions , values , 
+							cloudConfig[ scenes[ name ][ key ].config ] , schema , scenes[ name ][ key ].component );
+					}
 				}
-				else if ( devices[ label ].type == 'smartthings' )
+				else
 				{
-					cloudController.smartthings( label , actions , values , 
-						cloudConfig[ scenes[ name ][ key ].config ] , schema , scenes[ name ][ key ].component );
+					localController.run( label , schema , actions , values );
 				}
 			}
-			else
-			{
-				localController.run( label , schema , actions , values );
-			}
+		}
+		catch( error )
+		{
+			let msg = "Scene " + name + " " + error;
+			req.logger.error( msg );
+			result = req.resHandler.payload( true , -14 , msg , {} );
+			return res.status( 500 ).end( result );
 		}
 	} )( );
 	let msg = "Executing scene '" + name + "'";
@@ -175,48 +183,20 @@ app.get( '/local/query/:name' , ( req , res ) =>
 	let name = req.params.name;
 	let rt = fs.readFileSync( './config/scenes.json' );
 	let scenes = JSON.parse( rt );
-	let raw = fs.readFileSync( './config/local/schemas.json' );
-	let schemas = JSON.parse( raw );
-	if ( !scenes[ name ] )
+	if ( !req.paramsHandler.checkSceneName( name , scenes ) )
 	{
-		let msg = "Abort: '" + name + "' scene does not exist";
-		req.logger.error( msg );
-		result = req.resHandler.payload( false , -10 , msg , {} );
-		res.end( result );
 		return false;
 	}
-	let request = require( 'request' );
-	let getData = function( key )
-	{
-		let obj = 
-		{
-			uri: 'http://127.0.0.1:' + config.port + '/local/device/' + key + '/?action=info' ,
-			method: 'GET'
-		};
-			
-		return new Promise( function( resolve , reject ) 
-		{
-			request( obj , function ( error , res , body ) 
-			{
-				if ( !error && res.statusCode == 200 ) 
-				{
-					resolve( body );
-				} 
-				else 
-				{
-					resolve( error );
-					//reject( error );
-				}
-			} );
-		} );
-	};
+	let raw = fs.readFileSync( './config/local/schemas.json' );
+	let schemas = JSON.parse( raw );
 	let devs = fs.readFileSync( './config/local/devices.json' );
 	let devices = JSON.parse( devs );
+	let localController = require( './controllers/local' )( req , res , devices );
 	let cloudConfig = JSON.parse( fs.readFileSync( './config/cloud.json' ) );
 	let cloudController = require( './controllers/cloud' )( req , res , devices );
-	let token = '';
 	( async function( )
 	{
+		let token = '';
 		let body = { };
 		try
 		{
@@ -226,57 +206,36 @@ app.get( '/local/query/:name' , ( req , res ) =>
 				let data = '';
 				if ( scenes[ name ][ key ].type == 'cloud' )
 				{
-					if ( !token )
-					{
-						token = await cloudController.getToken( devices[ key ].type , cloudConfig[ scenes[ name ][ key ].config ] );
-					}
 					actions = actions.split( '^' );
-					let query = await cloudController.deviceData( token , key , actions , '' , cloudConfig[ scenes[ name ][ key ].config ] );
-					if ( actions == "info" )
+					let config = cloudConfig[ scenes[ name ][ key ].config ];
+					if ( devices[ key ].type == 'tuya' )
 					{
-						data = Object.assign( { } , query.result );
-						for ( const k in data )
+						if ( !token )
 						{
-							data[ data[ k ].code ] = data[ k ].value;
+							token = await cloudController.getTuyaCloudToken( config );
 						}
+						let query = await cloudController.getTuyaCloudDeviceData( token , key , config );
+						data = req.paramsHandler.parseTuyaCloudQueryData( actions , query.result );
+					}
+					else if ( devices[ key ].type == 'smartthings' )
+					{
+						let query = await cloudController.getSmartThingsDeviceData( key , scenes[ name ][ key ].component , config );
+						let schema = schemas[ devices[ key ].type ][ devices[ key ].category ];
+						data = req.paramsHandler.parseSmartThingsCloudQueryData( actions , query.data , schema );
 					}
 					else
 					{
-						data = { };
-						for ( const k in actions )
-						{
-							for ( const key of query.result  )
-							{
-								if ( key.code == actions[ k ] )
-								{
-									data[ actions[ k ] ] = key.value;
-								}
-								
-							}
-						}
+						let msg = "Device cloud type " + name + ":" + devices[ key ].type + ' not supported';
+						req.logger.error( msg );
+						result = req.resHandler.payload( true , -15 , msg , {} );
+						return res.status( 500 ).end( result );
 					}
 				}
 				else
 				{
-					let query = await getData( key );
-					if ( actions == "info" )
-					{
-						data =  JSON.parse( query ).result.data;
-					}
-					else
-					{
-						data = {};
-						actions = actions.split( '^' );
-						let values = JSON.parse( query );
-						for ( const k in actions )
-						{
-							val = ( actions[ k ] == 'off' || actions[ k ] == 'on' ) ? 'switch' : actions[ k ];
-							if ( values.result.data.hasOwnProperty( actions[ k ] ) )
-							{
-								data[ val ] = values.result.data[ val ];
-							}
-						}
-					}
+					let url = 'http://127.0.0.1:' + config.port + '/local/device/' + key + '/?action=info';
+					let query = await localController.request( url );
+					data = req.paramsHandler.parseLocalQueryData( actions , query );
 				}
 				body[ key ]= data;		
 			}
@@ -291,16 +250,14 @@ app.get( '/local/query/:name' , ( req , res ) =>
 		req.logger.msg( "Scene '" + name + "' query result" , body );
 		result = req.resHandler.payload( true , 200 , "Scene '" + name + "' query result" , body );
 		res.end( result );
-		
 	} )( );
 } );
 
 app.get( '/local/device/:label' , ( req , res ) => 
 {
 	let label = req.params.label;
-	let params = require( './helpers/params-handler' )( req , res );
-	let actions = params.actions( );
-	if ( !params.actions( ) )
+	let actions = req.paramsHandler.actions( );
+	if ( !actions )
 	{
 		return false;
 	}
@@ -308,12 +265,12 @@ app.get( '/local/device/:label' , ( req , res ) =>
 	let devices = JSON.parse( devs );
 	let raw = fs.readFileSync( './config/local/schemas.json' );
 	let schemas = JSON.parse( raw );
-	let schema = params.schema( label , schemas , devices );
+	let schema = req.paramsHandler.schema( label , schemas , devices );
 	if ( !schema )
 	{
 		return false;
 	}
-	let values = params.values( );
+	let values = req.paramsHandler.values( );
 	let localController = require( './controllers/local' )( req , res , devices );
 	localController.run( label , schema , actions , values );
 } );
@@ -323,162 +280,27 @@ app.get( '/local/eval/:name' , ( req , res ) =>
 	let name = req.params.name;
 	let conds = fs.readFileSync( './config/conditions.json' );
 	let conditions = JSON.parse( conds );
-	if ( !conditions[ name ] )
+	if ( !req.paramsHandler.checkConditionName( name, conditions ) )
 	{
-		let msg = "Abort: '" + name + "' condition does not exist";
-		req.logger.error( msg );
-		result = req.resHandler.payload( false , -10 , msg , {} );
-		res.end( result );
 		return false;
 	}
 	let request = require( 'request' );
-	let params = require( './helpers/params-handler' )( req , res );
-	
-	//let conditionsController = require( 'conditions' );
-
-	let runScene = function( name )
-	{
-		let obj = 
-		{
-			uri: 'http://127.0.0.1:' + config.port + '/local/scene/' + name + '/' ,
-			method: 'GET'
-		};
-			
-		return new Promise( function( resolve , reject ) 
-		{
-			request( obj , function ( error , res , body ) 
-			{
-				if ( !error && res.statusCode == 200 ) 
-				{
-					resolve( body );
-				} 
-				else 
-				{
-					resolve( error );
-					//reject( error );
-				}
-			} );
-		} );
-	};
-	
-	let getData = function( key )
-	{
-		let obj = 
-		{
-			uri: 'http://127.0.0.1:' + config.port + '/local/device/' + key + '/?action=info' ,
-			method: 'GET'
-		};
-			
-		return new Promise( function( resolve , reject ) 
-		{
-			request( obj , function ( error , res , body ) 
-			{
-				if ( !error && res.statusCode == 200 ) 
-				{
-					resolve( body );
-				} 
-				else 
-				{
-					resolve( error );
-					//reject( error );
-				}
-			} );
-		} );
-	};
-	
-	let testCond = ( async function( )
-	{
-		let testCondition = false;
-		for ( const key in conditions[ name ].conditions )
-		{
-			let label = conditions[ name ].conditions[ key ].label;
-			let query = await getData( label );
-			let data = JSON.parse( query ).result.data;
-			let eval = conditions[ name ].conditions[ key ].eval.split( '^' );
-			for ( const k in eval )
-			{
-				req.logger.msg( "Starting to check condition " + label + ' => ' , eval );
-				testCondition = params.testConditions( eval[ k ] , data , label );
-				if ( testCondition )
-				{
-					testCondition = true;
-				}
-				else
-				{
-					if ( conditions[ name ].conditions[ k ].hasOwnProperty( 'or' ) )
-					{
-						let testOr = false;
-						let or = conditions[ name ].conditions[ k ].or;
-						for ( const key in or )
-						{
-							req.logger.msg( "Starting to check subcondition " + or[ key ].label + ' => ' , or[ key ].eval );
-							let testOrCond = await testCondTest( or[ key ] );
-							if ( testOrCond )
-							{
-								testOr = true;
-								testCondition = true;
-								break;
-							}
-							else
-							{
-								testOr = false
-								testCondition = false;
-							}
-							req.logger.msg( "Finished checking subcondition " + or[ key ].label + ' => ' , or[ key ].eval );
-						}
-						if ( !testOr )
-						{
-							testCondition = false;
-							break;
-						}
-					}
-					else
-					{
-						testCondition = false;
-						break;
-					}
-				
-				}
-				req.logger.msg( "Finished checking condition " + label + ' => ' , eval );
-			}
-		}
-		return testCondition;
-	} );
-	
-	let testCondTest = ( async function( condition )
-	{
-		let testCondition = false;
-		let query = await getData( condition.label );
-		let data = JSON.parse( query ).result.data;
-		let eval = condition.eval.split( '^' );
-		for ( const k in eval )
-		{
-			testCondition = params.testConditions( eval[ k ] , data , condition.label );
-			if ( testCondition )
-			{
-				testCondition = true;
-			}
-			else
-			{
-				testCondition = false;
-				break;
-			}
-		}
-		return testCondition;
-	} );
-	
+	let localController = require( './controllers/local' )( req , res , null );
+	let conditionsModel = require( './models/conditions' )( req , res , localController , req.paramsHandler );
 	( async function( )
 	{
-		let condStatus = await testCond( );
+		let condStatus = await conditionsModel.eval( name , conditions , config );
 		if ( condStatus === true && conditions[ name ].hasOwnProperty( 'then' ) )
 		{
 			req.logger.msg( 'The conditions result is true, running then opertator' , conditions[ name ].then );
-			runScene( conditions[ name ].then.run );
+			let url = 'http://127.0.0.1:' + config.port + '/local/scene/' + conditions[ name ].then.run + '/'
+			localController.request( url );
 		}
 		else if ( conditions[ name ].hasOwnProperty( 'else' ) )
 		{
 			req.logger.msg( 'The condition result is false, running else operator' , conditions[ name ][ 'else' ] );
-			runScene( conditions[ name ][ 'else' ].run );
+			let url = 'http://127.0.0.1:' + config.port + '/local/scene/' + conditions[ name ][ 'else' ].run + '/'
+			localController.request( url );
 		}
 		else
 		{
@@ -488,7 +310,6 @@ app.get( '/local/eval/:name' , ( req , res ) =>
 		res.header( 'Content-Type' , 'application/json' );
 		res.status( 200 ).send( result );
 		return false;
-		
 	} )( );
 } );
 
@@ -532,132 +353,31 @@ app.get( '/cloud/:engine/:type/:label' , ( req , res ) =>
 	return false;
 } );
 
-app.all( [ '/cloud/:engine/:type/:label/:request/:thingID?' ,  
-		'/cloud/:engine/:type/:label/:request/:thingID/:componentID?' , 
-		'/cloud/:engine/:type/:label/:request/:thingID/:componentID/:capabilityID?' ] , ( req , res ) => 
+app.all( [ '/cloud/:engine/:type/:label/:request/:param1?' ,  
+		'/cloud/:engine/:type/:label/:request/:param1/:param2?' , 
+		'/cloud/:engine/:type/:label/:request/:param1/:param2/:param3?' ] , ( req , res ) => 
 {
 	let request = req.params.request;
 	let type = req.params.type;
 	let label = req.params.label;
 	let engine = req.params.engine;
-	let thing_id = req.params.thingID;
-	let component_id = req.params.componentID;
-	let capability_id = req.params.capabilityID;
-	let types = [ 'home' , 'scenes' , 'token' , 'devices' ];
-	if ( !types.includes( type ))
-	{
-		let msg = "Error: type '" + type + "' is not supported";
-		req.logger.error( msg );
-		result = req.resHandler.payload( false , -13 , msg , { } );
-		res.header( 'Content-Type' , 'application/json' );
-		res.status( 500 ).send( result );
-		return false;
-	}
+	let params = [ req.params.param1 , req.params.param2 , req.params.param3 ];
 	let config = JSON.parse( fs.readFileSync( './config/cloud.json' ) );
-	if ( !config.hasOwnProperty( label ) )
+	if ( !req.paramsHandler.checkCloudConfig( label , config ) )
 	{
-		let msg = "Error: Coudn't find config with name '" + request + "'"
-		req.logger.error( msg );
-		result = req.resHandler.payload( false , -12 , msg , { } );
-		res.header( 'Content-Type' , 'application/json' );
-		res.status( 500 ).send( result );
 		return false;
 	}
+	request = request.replace( new RegExp(/-/, 'g' ) , '_' );
 	if ( engine == 'tuya' )
 	{
-		let app_key = config[ label ].appKey;
-		let home_id = config[ label ].homeID;
 		let TuyaCloud = require( 'tuyacloudnodejs' );
-		let Tuya = new TuyaCloud( config[ label ] );
-		let endpoints = Tuya[ type ]( )._endpoints;
-		request = request.replace( new RegExp(/-/, 'g') , '_' );
-		if ( !endpoints.hasOwnProperty( request ) )
-		{
-			let msg = "Invalid endpoint '" + request + "'";
-			req.logger.error( msg );
-			result = req.resHandler.payload( false , -12 , msg , { "endpoints list": endpoints } );
-			res.header( 'Content-Type' , 'application/json' );
-			res.status( 500 ).send( result );
-			return false;
-		}
-		let uri = endpoints[ request ];
-		if ( thing_id )
-		{
-			let devs = fs.readFileSync( './config/local/devices.json' );
-			let devices = JSON.parse( devs );
-			if ( devices.hasOwnProperty( thing_id ) )
-			{
-				thing_id = devices[ thing_id ].id;
-			}
-		}
-		uri = uri.replace( '{home_id}' , config[ label ].homeID );
-		uri = uri.replace( '{uid}' , config[ label ].uid );
-		uri = uri.replace( '{appId}' , config[ label ].appKey );
-		uri = uri.replace( '{user_id}' , config[ label ].user_id );
-		uri = uri.replace( '{room_id}' , thing_id );
-		uri = uri.replace( '{function_code}' , thing_id );
-		uri = uri.replace( '{device_group_id}' , thing_id );
-		uri = uri.replace( '{group_id}' , thing_id );
-		uri = uri.replace( '{device_id}' , thing_id );
-		uri = uri.replace( '{scene_id}' , thing_id );
-		( async function( ) 
-		{
-			// get a new token
-			req.logger.cloud( "Starting tuya cloud token call" );
-			let data = await Tuya.token( ).get_new( );
-			let d = data;//JSON.parse( data );
-			req.logger.cloud( 'Tuya cloud token call result: ' , data )
-			let requestHandler = Tuya._dependencies.Request( config[ label ] , Tuya._dependencies );
-			let payload = ( Object.keys( req.body ).length !== 0 ) ? req.body : '';
-			req.logger.cloud( "Starting tuya cloud request " + request + ' ' + req.method + ' => ' + uri , payload );
-			data = await requestHandler.call( uri , req.method , d.result.access_token , payload , '' );
-			req.logger.cloud( "Finished tuya cloud request " + req.method + ' => ' + uri  , data );
-			res.header( 'Content-Type' , 'application/json' );
-			//res.status( 200 ).send( data );
-			data = JSON.stringify( data );
-			res.status( 200 ).end( data );
-			//res.end( data );
-		} )( );
+		var Caller = new TuyaCloud( config[ label ] );
+		  
 	}
 	else if ( engine == 'smartthings' )
 	{
 		let SmartThings = require( 'smartthingsnodejs' );
-		let engine = new SmartThings( config[ label ] );
-		let endpoints = engine[ type ]( )._endpoints;
-		request = request.replace( new RegExp(/-/, 'g' ) , '_' );
-		if ( !endpoints.hasOwnProperty( request ) )
-		{
-			let msg = "Invalid endpoint '" + request + "'";
-			req.logger.error( msg );
-			result = req.resHandler.payload( false , -12 , msg , { "endpoints list": endpoints } );
-			res.header( 'Content-Type' , 'application/json' );
-			res.status( 500 ).send( result );
-			return false;
-		}
-		let uri = endpoints[ request ];
-		if ( thing_id )
-		{
-			let devs = fs.readFileSync( './config/local/devices.json' );
-			let devices = JSON.parse( devs );
-			if ( devices.hasOwnProperty( thing_id ) )
-			{
-				thing_id = devices[ thing_id ].id;
-			}
-		}
-		uri = uri.replace( '{device_id}' , thing_id );
-		uri = uri.replace( '{component_id}' , component_id );
-		uri = uri.replace( '{capability_id}' , capability_id );
-		( async function( ) 
-		{
-			let requestHandler = engine._dependencies.Request( config[ label ] , engine._dependencies );
-			let payload = ( Object.keys( req.body ).length !== 0 ) ? req.body : '';
-			req.logger.cloud( "Starting smartthings cloud request " + request + ' ' + req.method + ' => ' + uri , payload );
-			data = await requestHandler.call( uri , req.method , payload );
-			req.logger.cloud( "Finished smartthings cloud request " + req.method + ' => ' + uri  , data );
-			res.header( 'Content-Type' , 'application/json' );
-			data = JSON.stringify( data );
-			res.status( 200 ).end( data );
-		} )( );
+		var Caller = new SmartThings( config[ label ] );
 	}
 	else
 	{
@@ -667,6 +387,60 @@ app.all( [ '/cloud/:engine/:type/:label/:request/:thingID?' ,
 		res.header( 'Content-Type' , 'application/json' );
 		res.status( 500 ).send( result );
 		return false;
+	}
+	if ( !req.paramsHandler.checkCloudTypes( type , engine ) )
+	{
+		return false;
+	}
+	let endpoints = Caller[ type ]( )._endpoints;
+	if ( !req.paramsHandler.checkEndpoint( endpoints , request ) )
+	{
+		return false;
+	}
+	let uri = endpoints[ request ];
+	if ( params[ 0 ] )
+	{
+		let devs = fs.readFileSync( './config/local/devices.json' );
+		let devices = JSON.parse( devs );
+		if ( devices.hasOwnProperty( params[ 0 ] ) )
+		{
+			params[ 0 ] = devices[ params[ 0 ] ].id;
+		}
+	}
+	if ( engine == 'tuya' )
+	{
+		let app_key = config[ label ].appKey;
+		let home_id = config[ label ].homeID;
+		uri = req.paramsHandler.formatTuyaCloudEndpoint( uri , params , config[ label ] );
+		( async function( ) 
+		{
+			// get a new token
+			req.logger.cloud( "Starting tuya cloud token call" );
+			let data = await Caller.token( ).get_new( );
+			let d = data;//JSON.parse( data );
+			req.logger.cloud( 'Tuya cloud token call result: ' , data )
+			let requestHandler = Caller._dependencies.Request( config[ label ] , Caller._dependencies );
+			let payload = ( Object.keys( req.body ).length !== 0 ) ? req.body : '';
+			req.logger.cloud( "Starting tuya cloud request " + request + ' ' + req.method + ' => ' + uri , payload );
+			data = await requestHandler.call( uri , req.method , d.result.access_token , payload , '' );
+			req.logger.cloud( "Finished tuya cloud request " + req.method + ' => ' + uri  , data );
+			res.header( 'Content-Type' , 'application/json' );
+			res.status( 200 ).end( JSON.stringify( data ) );
+		} )( );
+	}
+	else if ( engine == 'smartthings' )
+	{
+		uri = req.paramsHandler.formatSmartThingsCloudEndpoint( uri , params );
+		( async function( ) 
+		{
+			let requestHandler = Caller._dependencies.Request( config[ label ] , Caller._dependencies );
+			let payload = ( Object.keys( req.body ).length !== 0 ) ? req.body : '';
+			req.logger.cloud( "Starting SmartThings cloud request " + request + ' ' + req.method + ' => ' + uri , payload );
+			data = await requestHandler.call( uri , req.method , payload );
+			req.logger.cloud( "Finished SmartThings cloud request " + req.method + ' => ' + uri  , data );
+			res.header( 'Content-Type' , 'application/json' );
+			res.status( 200 ).end( JSON.stringify( data ) );
+		} )( );
 	}
 } );
 
@@ -687,8 +461,9 @@ app.get( '*' , ( req , res ) =>
 
 app.use( function( err , req , res , next ) 
 {
-	let error = err.stack.split ( "\n" , 1 ).join( "" );
-	req.logger.error( err.stack );
+	logger = require( './helpers/logger' )( req.session );
+	let error = ( err.hasOwnProperty( 'stack' ) ) ? err.stack.split ( "\n" , 1 ).join( "" ) : err;
+	logger.error( ( ( err.hasOwnProperty( 'stack' ) ) ? err.stack : err ) );
 	result = req.resHandler.payload( false , 500 , 'Fatal error: ' + error , {} );
 	res.header( 'Content-Type' , 'application/json' );
 	res.status( 500 ).send( result );	

@@ -1,3 +1,5 @@
+const util = require('util');
+
 module.exports = function( session )
 {
 	let module = { };
@@ -8,6 +10,7 @@ module.exports = function( session )
 	{
 		if ( data )
 		{
+			data = util.inspect( data , { "showHidden": false , "depth": null , "colors": true } );
 			console.log( '[' + this._getTime( ) + '][' + module.session + '] ' + msg , data );
 		}
 		else
@@ -21,6 +24,7 @@ module.exports = function( session )
 	{
 		if ( data )
 		{
+			data = util.inspect( data , { "showHidden": false , "depth": null , "colors": true } );
 			console.log( '\x1b[36m%s\x1b[0m' , '[' + this._getTime( ) + '][' + module.session + '] ' + msg , data );
 		}
 		else
@@ -34,7 +38,8 @@ module.exports = function( session )
 	{
 		if ( data )
 		{
-			data = ( Object.keys( data ).length !== 0 ) ? JSON.stringify( data ) : data;
+			//data = ( Object.keys( data ).length !== 0 ) ? JSON.stringify( data ) : data;
+			data = util.inspect( data , { "showHidden": false , "depth": null , "colors": true } );
 			console.log( "\x1b[43m" , '[' + this._getTime( ) + '][' + module.session + '] ' + msg + "\x1b[0m" , data );
 		}
 		else
@@ -48,6 +53,7 @@ module.exports = function( session )
 	{
 		if ( data )
 		{
+			data = util.inspect( data , { "showHidden": false , "depth": null , "colors": true } );
 			console.log( '\x1b[33m%s\x1b[0m' , '[' + this._getTime( ) + '][' + module.session + '] ' + msg , data );
 		}
 		else
@@ -61,6 +67,7 @@ module.exports = function( session )
 	{
 		if ( data )
 		{
+			data = util.inspect( data , { "showHidden": false , "depth": null , "colors": true } );
 			console.log( '\x1b[32m%s\x1b[0m' , '[' + this._getTime( ) + '][' + module.session + '] ' + msg , data );
 		}
 		else
@@ -74,6 +81,7 @@ module.exports = function( session )
 	{
 		if ( data )
 		{
+			data = util.inspect( data , { "showHidden": false , "depth": null , "colors": true } );
 			console.log( '\x1b[32m%s\x1b[0m' , '[' + this._getTime( ) + '][' + module.session + '] ' + msg , data );
 		}
 		else
@@ -87,6 +95,7 @@ module.exports = function( session )
 	{
 		if ( data )
 		{
+			data = util.inspect( data , { "showHidden": false , "depth": null , "colors": true } );
 			console.error( "\x1b[41m" , '[' + this._getTime( ) + '][' + module.session + '] ' + msg + "\x1b[0m" , data );
 		}
 		else
@@ -100,6 +109,7 @@ module.exports = function( session )
 	{
 		if ( data )
 		{
+			data = util.inspect( data , { "showHidden": false , "depth": null , "colors": true } );
 			console.error( "\x1b[44m" , '[' + this._getTime( ) + '][' + module.session + '] ' + msg + "\x1b[0m" , data );
 		}
 		else
