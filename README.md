@@ -58,27 +58,27 @@ npm install smartthingsnodejs
 ## Main endpoints
 
 Actions are found in the schema file.\
-Cloud types are "scenes|devices|home|token"\ for tuya and "devices" for smartthings
-Use get-methods as a method to see all the cloud types methods available
+Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
+Use get-methods for each type as a method to see all the cloud methods available
 
 Run an action on a device\
-http:serveraddress:port/local/device/{label}/?actions={actions}&values={values}
+http://address:port/local/device/{label}/?actions={actions}&values={values}
 
 Run a scene\
-http:serveraddress:port/local/scene/{name}/
+http://address:port/local/scene/{name}/
 
 Query a scene\
-http:serveraddress:port/local/query/{name}/
+http://address:port/local/query/{name}/
 
 Evaluate a condition\
-http:serveraddress:port/local/eval/{name}/
+http://address:port/local/eval/{name}/
 
 Direct tuya cloud requests\
-http:serveraddress:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
+http://address:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
 
 Direct smartthings cloud requests\
-http:serveraddress:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{method}/{component?}/{capability?}/
+http://address:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{method}/{component?}/{capability?}/
 
 
 
-*** Cloud support is available for tuya and smartthings devices at the moment.
+*** Cloud support is available for tuya and SmartThings devices at the moment (no cloud Xiaomi support).
