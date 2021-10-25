@@ -147,7 +147,7 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 					{
 						if ( !token )
 						{
-							token = await cloudController.getToken( devices[ label ].type , cloudConfig[ scenes[ name ][ key ].config ] );
+							token = await cloudController.getTuyaCloudToken( devices[ label ].type , cloudConfig[ scenes[ name ][ key ].config ] );
 						}
 						cloudController.executeTuyaCloudScene( token , label , actions , values , cloudConfig[ scenes[ name ][ key ].config ] );
 					}
