@@ -425,8 +425,9 @@ app.all( [ '/cloud/:engine/:type/:label/:request/:param1?' ,
 			data = await requestHandler.call( uri , req.method , d.result.access_token , payload , '' );
 			req.logger.cloud( "Finished tuya cloud request " + req.method + ' => ' + uri  , data );
 			res.header( 'Content-Type' , 'application/json' );
-			data = JSON.stringify( data );
-			res.status( 200 ).end( data.replace( /\\/g , "" ) );
+			//data = JSON.stringify( data );
+			//res.status( 200 ).end( data.replace( /\\/g , "" ) );
+			res.status( 200 ).end( JSON.stringify( data ) );
 		} )( );
 	}
 	else if ( engine == 'smartthings' )
