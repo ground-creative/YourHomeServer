@@ -120,7 +120,7 @@ module.exports = function ( req , res , devices )
 	};
 		
 	module.getTuyaCloudToken = async function( config )
-	{
+	{		
 		let TuyaCloud = this.getEngine( 'tuya' );
 		let Tuya = new TuyaCloud( config );
 		req.logger.cloud( "Starting tuya cloud token call" );

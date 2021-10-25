@@ -76,7 +76,7 @@ http://address:port/local/eval/{name}/
 Direct tuya cloud requests\
 http://address:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
 
-Direct smartthings cloud requests\
+Direct SmartThings cloud requests\
 http://address:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{method}/{component?}/{capability?}/
 
 
