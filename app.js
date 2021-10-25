@@ -147,10 +147,6 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 					{
 						if ( !token )
 						{
-							
-							console.log( 'ddddddddddddddddd' , cloudConfig[ scenes[ name ][ key ].config ] );
-							
-							
 							token = await cloudController.getTuyaCloudToken( cloudConfig[ scenes[ name ][ key ].config ] );
 						}
 						cloudController.executeTuyaCloudScene( token , label , actions , values , cloudConfig[ scenes[ name ][ key ].config ] );
