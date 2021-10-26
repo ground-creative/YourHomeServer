@@ -69,20 +69,21 @@ Configure device example:
 ```
 "lr-light1":
 {
-	"id": "eba9bce17c59213edf47g1",
-	"key": "af7edc409a4a6cc6" ,
-	"ip": "192.168.2.8" ,
-	"type": "tuya" ,	// tuya|miio|smartthings
-	"category":"dj" 	// categories found in ./config/local/schemas.json
+	"id": "XXXXXXXXXXXXXXXXXXX",					// required for tuya and smart things devices, not used for miio devices
+	"key": "XXXXXXXXXXXXXXX" ,					// required for tuya devices only
+	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" ,		// required for miio devices only
+	"ip": "192.168.2.8" ,							// only for local device control tuya and miio , required only for miio devices
+	"type": "tuya" ,								// tuya|miio|smartthings
+	"category":"dj" 								// required, categories found in ./config/local/schemas.json
 }
 ```
 Configure scene to be triggered example (acts as a device):
-````
+```
 "sc-tv-mute-toggle":
 {
-	"id": "InQoaFbmBrqyPRTm" ,
+	"id": "XXXXXXXXXXXXXXXXXXX" ,
 	"type": "tuya" ,
-	"category":"scene"
+	"category":"scene"					// special catregory
 }
 ```
 ## Basic usage
