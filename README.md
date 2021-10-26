@@ -109,7 +109,7 @@ Configure device example
 	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" ,	// required for miio devices only
 	"ip": "192.168.2.8" ,				// only for local device control tuya and miio , required only for miio devices
 	"type": "tuya" ,				// tuya|miio|smartthings
-	"category":"dj" 				// required, categories found in ./config/local/schemas.json
+	"category":"dj" 				// required, categories are found in ./config/local/schemas.json
 }
 ```
 Configure scene to be triggered example (acts as a device)
@@ -154,10 +154,14 @@ http://address:port/local/query/air-values/
 ### Conditions configuration
 
 Configure your conditions to be evaluated in the ./config/conditions.json
+```
 To do
+```
 
 ### Cloud examples
+```
 To do
+```
 
 ## Main endpoints
 
