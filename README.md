@@ -1,6 +1,6 @@
 # YourHomeServer
 
-nodejs server based on express module to control tuya and miio devices locally or over the cloud
+A powerfull nodejs server based on express module to control tuya and miio devices locally or over the cloud
 
 ## Installation and start server
 
@@ -32,28 +32,33 @@ node app.js
 ```
 
 ## Tuya local module
+Use this module to control  control Tuya/Smart Life devices locally
 
 ```
 npm install codetheweb/tuyapi
 ```
 
 ## Miio local module
-
+Use this module to control Mi Home devices locally
 ```
 npm install miio-api
 ```
 
 ## Tuya cloud module
+Use this module to control  control Tuya/Smart Life devices over the cloud
 
 ```
 npm install tuyacloudnodejs
 ```
 
 ## SmartThings cloud module
+Use this module to control  control Smart Things devices over the cloud
 
 ```
 npm install smartthingsnodejs
 ```
+
+
 
 ## Main endpoints
 
