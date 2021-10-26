@@ -57,6 +57,7 @@ Use this module to control  control Smart Things devices over the cloud
 ```
 npm install smartthingsnodejs
 ```
+
 ## Basic usage
 
 Start by configuring a devices in the file ./config/local/devices.json (example with tuya device):
@@ -69,19 +70,20 @@ Start by configuring a devices in the file ./config/local/devices.json (example 
 	"category":"dj" 								
 }
 ```
-Make a request call to this endpoint to control your device, like the example shown below:
+Make a request to one of these endpoint to control your device, like the examples shown below:
 
-Get the device data
+Get the device data\
 http://address:port/local/device/lr-light1/?actions=info
 
-Trigger an action on the device (turn off light)
+Trigger an action on the device (turn off light)\
 http://address:port/local/device/lr-light1/?actions=off
 
-Another way to turn off the device
+Another way to turn off the device\
 http://address:port/local/device/lr-light1/?actions=switch&values=off
 
-Send multiple actions to perform on device
+Send multiple actions to perform on device\
 http://address:port/local/device/lr-light1/?actions=brightness^temperature^on&values=10^10
+
 
 ## Configuration files
 
