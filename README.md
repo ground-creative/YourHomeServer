@@ -123,6 +123,7 @@ Configure scene to be triggered example (acts as a device)
 ```
 ### Scenes configuration
 
+scenes can trigger actions on multiple devices at once, this is a ver powerful feature.
 Configure your scenes in the ./config/scenes.json
 
 Configure scene example (turn on living room lights):
