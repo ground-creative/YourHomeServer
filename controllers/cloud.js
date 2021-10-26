@@ -135,7 +135,7 @@ module.exports = function ( req , res , devices )
 		let SmartThings = new Module( config );
 		req.logger.cloud( "Getting SmartThings capabilities for device '" + label + "'" );
 		data = await SmartThings.devices( ).get_component( devices[ label ].id , component );
-		req.logger.cloud( "Tuya SmartThings capabilities for device '" + label + "'" , data );
+		req.logger.cloud( "Finished getting SmartThings capabilities for device '" + label + "'" , data );
 		return data;
 	};
 	

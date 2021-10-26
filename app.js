@@ -1,9 +1,8 @@
 const express = require( 'express' );
-const app = express( );
 const bodyParser = require('body-parser');
 const fs = require( 'fs' );
 const config = JSON.parse( fs.readFileSync( './config/config.json' ) );
-
+const app = express( );
 // parse application/x-www-form-urlencoded
 app.use( bodyParser.urlencoded( { extended: false } ) )
 
@@ -102,17 +101,14 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 {
 	let result = '';
 	let name = req.params.name;
-	let rt = fs.readFileSync( './config/scenes.json' );
-	let scenes = JSON.parse( rt );
+	let scenes = JSON.parse( fs.readFileSync( './config/scenes.json' ) );
 	let params = require( './helpers/params-handler' )( req , res );
 	if ( !req.paramsHandler.checkSceneName( name , scenes ) )
 	{
 		return false;
 	}
-	let devs = fs.readFileSync( './config/local/devices.json' );
-	let devices = JSON.parse( devs );
-	let raw = fs.readFileSync( './config/local/schemas.json' );
-	let schemas = JSON.parse( raw );
+	let devices = JSON.parse( fs.readFileSync( './config/local/devices.json' ) );
+	let schemas = JSON.parse( fs.readFileSync( './config/local/schemas.json' ) );
 	let localController = require( './controllers/local' )( req , res , devices );
 	let cloudController = require( './controllers/cloud' )( req , res , devices );
 	let cloudConfig = JSON.parse( fs.readFileSync( './config/cloud.json' ) );
@@ -129,6 +125,18 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 					req.logger.simple( 'Waiting ' + scenes[ name ][ key ] + ' milliseconds' );
 					await new Promise( resolve => setTimeout ( resolve , scenes[ name ][ key ] ) );
 					req.logger.simple( 'Finished waiting ' + scenes[ name ][ key ] + ' milliseconds' );
+					continue;
+				}
+				else if ( scenes[ name ][ key ].hasOwnProperty( 'eval' ) )
+				{
+					let url = 'http://127.0.0.1:' + config.port + '/local/eval/' + scenes[ name ][ key ].eval + '/';
+					localController.request( url );
+					continue;
+				}
+				else if ( scenes[ name ][ key ].hasOwnProperty( 'run' ) )
+				{
+					let url = 'http://127.0.0.1:' + config.port + '/local/scene/' + scenes[ name ][ key ].run + '/';
+					localController.request( url );
 					continue;
 				}
 				let label = key;
@@ -181,16 +189,13 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 app.get( '/local/query/:name' , ( req , res ) => 
 {
 	let name = req.params.name;
-	let rt = fs.readFileSync( './config/scenes.json' );
-	let scenes = JSON.parse( rt );
+	let scenes = JSON.parse( fs.readFileSync( './config/scenes.json' ) );
 	if ( !req.paramsHandler.checkSceneName( name , scenes ) )
 	{
 		return false;
 	}
-	let raw = fs.readFileSync( './config/local/schemas.json' );
-	let schemas = JSON.parse( raw );
-	let devs = fs.readFileSync( './config/local/devices.json' );
-	let devices = JSON.parse( devs );
+	let schemas = JSON.parse( fs.readFileSync( './config/local/schemas.json' ) );
+	let devices = JSON.parse( fs.readFileSync( './config/local/devices.json' ) );
 	let localController = require( './controllers/local' )( req , res , devices );
 	let cloudConfig = JSON.parse( fs.readFileSync( './config/cloud.json' ) );
 	let cloudController = require( './controllers/cloud' )( req , res , devices );
@@ -278,18 +283,21 @@ app.get( '/local/device/:label' , ( req , res ) =>
 app.get( '/local/eval/:name' , ( req , res ) => 
 {
 	let name = req.params.name;
-	let conds = fs.readFileSync( './config/conditions.json' );
-	let conditions = JSON.parse( conds );
+	let conditions = JSON.parse( fs.readFileSync( './config/conditions.json' ) );
 	if ( !req.paramsHandler.checkConditionName( name, conditions ) )
 	{
 		return false;
 	}
 	let request = require( 'request' );
-	let localController = require( './controllers/local' )( req , res , null );
-	let conditionsModel = require( './models/conditions' )( req , res , localController , req.paramsHandler );
+	let devices = JSON.parse( fs.readFileSync( './config/local/devices.json' ) );
+	let cloudConfig = JSON.parse( fs.readFileSync( './config/cloud.json' ) );
+	let schemas = JSON.parse( fs.readFileSync( './config/local/schemas.json' ) );	
+	let localController = require( './controllers/local' )( req , res , devices );
+	let cloudController = require( './controllers/cloud' )( req , res , devices );
+	let conditionsModel = require( './models/conditions' )( req , res , localController , cloudController , cloudConfig );
 	( async function( )
 	{
-		let condStatus = await conditionsModel.eval( name , conditions , config );
+		let condStatus = await conditionsModel.eval( name , conditions , config , schemas , devices );
 		if ( condStatus === true && conditions[ name ].hasOwnProperty( 'then' ) )
 		{
 			req.logger.msg( 'The conditions result is true, running then opertator' , conditions[ name ].then );
@@ -414,19 +422,15 @@ app.all( [ '/cloud/:engine/:type/:label/:request/:param1?' ,
 		uri = req.paramsHandler.formatTuyaCloudEndpoint( uri , params , config[ label ] );
 		( async function( ) 
 		{
-			// get a new token
 			req.logger.cloud( "Starting tuya cloud token call" );
 			let data = await Caller.token( ).get_new( );
-			let d = data;//JSON.parse( data );
 			req.logger.cloud( 'Tuya cloud token call result: ' , data )
 			let requestHandler = Caller._dependencies.Request( config[ label ] , Caller._dependencies );
 			let payload = ( Object.keys( req.body ).length !== 0 ) ? req.body : '';
 			req.logger.cloud( "Starting tuya cloud request " + request + ' ' + req.method + ' => ' + uri , payload );
-			data = await requestHandler.call( uri , req.method , d.result.access_token , payload , '' );
+			data = await requestHandler.call( uri , req.method , data.result.access_token , payload , '' );
 			req.logger.cloud( "Finished tuya cloud request " + req.method + ' => ' + uri  , data );
 			res.header( 'Content-Type' , 'application/json' );
-			//data = JSON.stringify( data );
-			//res.status( 200 ).end( data.replace( /\\/g , "" ) );
 			res.status( 200 ).end( JSON.stringify( data ) );
 		} )( );
 	}

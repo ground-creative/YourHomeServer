@@ -1,12 +1,22 @@
-const url = require( 'url' );
-
 module.exports = function ( req , res )
 {
 	var module = { };
 	
+	module._dependencies = function( )
+	{
+		if ( !this._Dependencies )
+		{
+			this._Dependencies =
+			{
+				"url" : require( 'url' )
+			};
+		}
+		return this._Dependencies;
+	};
+	
 	module.actions = function( )
 	{
-		let g = url.parse( req.url , true ).query;
+		let g = this._dependencies( ).url.parse( req.url , true ).query;
 		let act = ( g[ 'action' ] ) ? g[ 'action' ] : g[ 'actions' ];
 		let actions = ( act ) ? act.split( '^' ) : '';
 		if ( !actions )
@@ -19,7 +29,7 @@ module.exports = function ( req , res )
 	
 	module.values = function( )
 	{
-		let g = url.parse( req.url , true ).query;
+		let g = this._dependencies( ).url.parse( req.url , true ).query;
 		let vals = ( g[ 'value' ] ) ? g[ 'value' ] : g[ 'values' ];
 		let values = ( vals ) ? vals.split( '^' ) : '';
 		return values;
@@ -187,7 +197,7 @@ module.exports = function ( req , res )
 	
 	module.dynamicSceneValues = function( string )
 	{
-		let g = url.parse( req.url , true ).query;
+		let g = this._dependencies( ).url.parse( req.url , true ).query;
 		if ( Object.keys( g ).length !== 0 )
 		{
 			for ( const key in g )
@@ -209,7 +219,7 @@ module.exports = function ( req , res )
 		{
 			return false;
 		}
-		else if ( !isNaN( values[ i ] ) )
+		else if ( !isNaN( value ) )
 		{
 			return parseInt( value );
 		}
@@ -301,6 +311,8 @@ module.exports = function ( req , res )
 		res.header( 'Content-Type' , 'application/json' );
 		res.status( 500 ).send( result );	
 	};
+	
+	module._Dependencies = '';
 	
 	return module;
 };
