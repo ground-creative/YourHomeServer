@@ -73,13 +73,13 @@ Start by configuring a devices in the file ./config/local/devices.json (example 
 Make a request to one of these endpoint to control your device, like the examples shown below:
 
 Get the device data\
-http://address:port/local/device/lr-light1/?actions=info
+http://address:port/local/device/lr-light1/?action=info
 
 Trigger an action on the device (turn off light)\
-http://address:port/local/device/lr-light1/?actions=off
+http://address:port/local/device/lr-light1/?action=off
 
 Another way to turn off the device\
-http://address:port/local/device/lr-light1/?actions=switch&values=off
+http://address:port/local/device/lr-light1/?action=switch&value=off
 
 Send multiple actions to perform on device\
 http://address:port/local/device/lr-light1/?actions=brightness^temperature^on&values=10^10
@@ -88,12 +88,19 @@ http://address:port/local/device/lr-light1/?actions=brightness^temperature^on&va
 ## Configuration files
 
 ### Server configuration
-Configure the parameters for the server in the file ./config/config.json
-	
-### Device configuration
-Configure your devices in the file ./config/local/devices.json
+Configure custom server parameters in the file ./config/config.json
+```
+{
+	"address":"0.0.0.0" ,
+	"port": 3000 ,
+	"timeout": 60000
+}
+```
 
-Configure device example:
+### Device configuration
+Configure your devices and cloud scenes in the file ./config/local/devices.json
+
+Configure device example
 ```
 "lr-light1":
 {
@@ -105,7 +112,7 @@ Configure device example:
 	"category":"dj" 								// required, categories found in ./config/local/schemas.json
 }
 ```
-Configure scene to be triggered example (acts as a device):
+Configure scene to be triggered example (acts as a device)
 ```
 "sc-tv-mute-toggle":
 {
@@ -127,11 +134,28 @@ Configure scene example (turn on living room lights):
 	"lr-light3": { "actions": "brightness^temperature^on" , "values": "10^10" }
 }
 ```
+Run your scene\
+http://address:port/local/scene/lr-lights-on/
+
+### Query Scene configuration
+
+Create a scene just like the previous example and use either info as action of specify device fields found in the schema file:
+```
+"air-values":
+{
+	"lr-ir": { "actions": "info" } ,
+	"mb-ir": { "actions": "info" } , 
+	"mb-humidifier": { "actions": "info" }
+}
+```
+Query your scene and get devices data with this ednpoint\
+http://address:port/local/query/air-values/
+
+### Conditions configuration
 
 
-## Basic usage
-To control a device locally use the following endpoint
-http://address:port/local/device/{label}/?actions={actions}&values={values}
+### Cloud examples
+
 
 ## Main endpoints
 
