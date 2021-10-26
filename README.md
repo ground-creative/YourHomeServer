@@ -57,6 +57,34 @@ Use this module to control  control Smart Things devices over the cloud
 ```
 npm install smartthingsnodejs
 ```
+### Basic usage
+
+Configure a devices in the file ./config/local/devices.json
+```
+"lr-light1":
+{
+	"id": "XXXXXXXXXXXXXXXXXXX",					// required for tuya and smart things devices, not used for miio devices
+	"key": "XXXXXXXXXXXXXXX" ,					// required for tuya devices only
+	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" ,		// required for miio devices only
+	"ip": "192.168.2.8" ,							// only for local device control tuya and miio , required only for miio devices
+	"type": "tuya" ,								// tuya|miio|smartthings
+	"category":"dj" 								// required, categories found in ./config/local/schemas.json
+}
+```
+Make a request call to this endpoint to control your device, like the example shown below
+
+Get the device data:
+http://address:port/local/device/lr-light1/?actions=info
+
+Trigger an action on the device (turn off light):
+http://address:port/local/device/lr-light1/?actions=off
+
+Another way to turn off the device:
+http://address:port/local/device/lr-light1/?actions=switch&values=off
+
+Send multiple actions to perform on device:
+http://address:port/local/device/lr-light1/?actions=brightness^temperature^on&values=10^10
+
 ## Configuration files
 
 ### Server configuration
@@ -82,10 +110,25 @@ Configure scene to be triggered example (acts as a device):
 "sc-tv-mute-toggle":
 {
 	"id": "XXXXXXXXXXXXXXXXXXX" ,
-	"type": "tuya" ,
-	"category":"scene"					// special catregory
+	"type": "tuya" ,					// tuya|smartthings
+	"category":"scene"					// special category
 }
 ```
+### Scenes configuration
+
+Configure your scenes in the ./config/scenes.json
+
+Configure scene example (turn on living room lights):
+```
+"lr-lights-on":
+{
+	"lr-light1": { "actions": "brightness^temperature^on" , "values": "10^10" } , // use the device label
+	"lr-light2": { "actions": "brightness^temperature^on" , "values": "10^10" } ,
+	"lr-light3": { "actions": "brightness^temperature^on" , "values": "10^10" }
+}
+```
+
+
 ## Basic usage
 To control a device locally use the following endpoint
 http://address:port/local/device/{label}/?actions={actions}&values={values}
