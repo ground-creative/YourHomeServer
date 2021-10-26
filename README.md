@@ -85,7 +85,7 @@ Send multiple actions to perform on device\
 http://address:port/local/device/lr-light1/?actions=brightness^temperature^on&values=10^10
 
 
-## Configuration files
+## Advanced usage
 
 ### Server configuration
 Configure custom server parameters in the file ./config/config.json
@@ -104,12 +104,12 @@ Configure device example
 ```
 "lr-light1":
 {
-	"id": "XXXXXXXXXXXXXXXXXXX",					// required for tuya and smart things devices, not used for miio devices
-	"key": "XXXXXXXXXXXXXXX" ,					// required for tuya devices only
-	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" ,		// required for miio devices only
-	"ip": "192.168.2.8" ,							// only for local device control tuya and miio , required only for miio devices
-	"type": "tuya" ,								// tuya|miio|smartthings
-	"category":"dj" 								// required, categories found in ./config/local/schemas.json
+	"id": "XXXXXXXXXXXXXXXXXXX",			// required for tuya and smart things devices, not used for miio devices
+	"key": "XXXXXXXXXXXXXXX" ,			// required for tuya devices only
+	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" ,	// required for miio devices only
+	"ip": "192.168.2.8" ,				// only for local device control tuya and miio , required only for miio devices
+	"type": "tuya" ,				// tuya|miio|smartthings
+	"category":"dj" 				// required, categories found in ./config/local/schemas.json
 }
 ```
 Configure scene to be triggered example (acts as a device)
@@ -137,7 +137,7 @@ Configure scene example (turn on living room lights):
 Run your scene\
 http://address:port/local/scene/lr-lights-on/
 
-### Query Scene configuration
+### Query scene configuration
 
 Create a scene just like the previous example and use either info as action of specify device fields found in the schema file:
 ```
@@ -153,9 +153,11 @@ http://address:port/local/query/air-values/
 
 ### Conditions configuration
 
+Configure your conditions to be evaluated in the ./config/conditions.json
+To do
 
 ### Cloud examples
-
+To do
 
 ## Main endpoints
 
@@ -163,7 +165,7 @@ Actions are found in the schema file.\
 Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
 Use get-methods for each type as a method to see all the cloud methods available
 
-Run an action on a device\
+Run actions on a device\
 http://address:port/local/device/{label}/?actions={actions}&values={values}
 
 Run a scene\
