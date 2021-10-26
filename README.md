@@ -1,6 +1,6 @@
 # YourHomeServer
 
-A powerfull nodejs server based on express module to control tuya and miio devices locally or over the cloud
+A powerfull nodejs server based on express module to control different smart home device brands locally or over the cloud.
 
 ## Installation and start server
 
@@ -52,7 +52,7 @@ npm install tuyacloudnodejs
 ```
 
 ## SmartThings cloud module
-Use this module to control  control Smart Things devices over the cloud
+Use this module to control  control SmartThings devices over the cloud
 
 ```
 npm install smartthingsnodejs
@@ -139,7 +139,7 @@ http://address:port/local/scene/lr-lights-on/
 
 ### Query scene configuration
 
-Create a scene just like the previous example and use either info as action of specify device fields found in the schema file:
+Create a scene just like the previous example and use either info as action or specify device fields found in the schema file:
 ```
 "air-values":
 {
