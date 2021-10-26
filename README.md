@@ -65,9 +65,8 @@ Configure the parameters for the server in the file ./config/config.json
 ### Device configuration
 Configure your devices in the file ./config/local/devices.json
 
-```
 Configure device example:
-
+```
 "lr-light1":
 {
 	"id": "eba9bce17c59213edf47g1",
@@ -76,8 +75,9 @@ Configure device example:
 	"type": "tuya" ,	// tuya|miio|smartthings
 	"category":"dj" 	// categories found in ./config/local/schemas.json
 }
-	
+```
 Configure scene to be triggered example (acts as a device):
+````
 "sc-tv-mute-toggle":
 {
 	"id": "InQoaFbmBrqyPRTm" ,
