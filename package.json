@@ -1,9 +1,10 @@
 {
 	"name": "YourHomeSever",
 	"main": "app.js",
-	"description": "",
-	"dependencies": 
-	{
-		"express": "^4.17.1"
+	"description": "YourHomeServer, control smart home devices from various brands locally or over the cloud.",
+	"author": "groundcreative",
+	"dependencies": {
+		"express": "^4.17.1",
+		"util": "^0.12.4"
 	}
 }
