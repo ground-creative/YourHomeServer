@@ -66,7 +66,9 @@
 			"switch_off": { "command": "off" , "capability": "switch" } ,
 			"inputSource":{ "command": "setInputSource" , "capability": "mediaInputSource" } ,
 			"playbackStatus":{ "command": "setPlaybackStatus" , "capability": "mediaPlayback" } ,
-			"presets":{ "command": "playPreset" , "capability": "mediaPresets" }
+			"presets":{ "command": "playPreset" , "capability": "mediaPresets" } ,
+			"pictureMode":{ "command": "setPictureMode" , "capability": "custom.picturemode" } ,
+			"soundMode":{ "command": "setSoundMode" , "capability": "custom.soundmode" }
 		} , 
 		"scene": { }
 	} ,
