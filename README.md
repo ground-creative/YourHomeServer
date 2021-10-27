@@ -123,10 +123,17 @@ Configure scene to be triggered example (acts as a device)
 ```
 ### Scenes configuration
 
+<<<<<<< Updated upstream
 scenes can trigger actions on multiple devices at once, this is a ver powerful feature.
 Configure your scenes in the ./config/scenes.json
 
 Configure scene example (turn on living room lights):
+=======
+Scenes can trigger actions on multiple devices at once, this is a ver powerful feature.\
+Configure your scenes in the ./config/scenes.json.
+
+Scene configuration example (turn on living room lights):
+>>>>>>> Stashed changes
 ```
 "lr-lights-on":
 {
@@ -140,6 +147,11 @@ http://address:port/local/scene/lr-lights-on/
 
 ### Query scene configuration
 
+<<<<<<< Updated upstream
+=======
+This feauture allows you to make a request to retrieve values from multiple devices at once.\
+
+>>>>>>> Stashed changes
 Create a scene just like the previous example and use either info as action or specify device fields found in the schema file:
 ```
 "air-values":

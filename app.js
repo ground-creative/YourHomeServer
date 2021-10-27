@@ -129,13 +129,15 @@ app.get( '/local/scene/:name' , ( req , res ) =>
 				}
 				else if ( scenes[ name ][ key ].hasOwnProperty( 'eval' ) )
 				{
-					let url = 'http://127.0.0.1:' + config.port + '/local/eval/' + scenes[ name ][ key ].eval + '/';
+					let g = req.paramsHandler._dependencies( ).url.parse( req.url ).query;
+					let url = 'http://127.0.0.1:' + config.port + '/local/eval/' + scenes[ name ][ key ].eval + '/' + ( ( g ) ? '?' + g : '' );
 					localController.request( url );
 					continue;
 				}
 				else if ( scenes[ name ][ key ].hasOwnProperty( 'run' ) )
 				{
-					let url = 'http://127.0.0.1:' + config.port + '/local/scene/' + scenes[ name ][ key ].run + '/';
+					let g = req.paramsHandler._dependencies( ).url.parse( req.url ).query;
+					let url = 'http://127.0.0.1:' + config.port + '/local/scene/' + scenes[ name ][ key ].run + '/' + ( ( g ) ? '?' + g : '' );
 					localController.request( url );
 					continue;
 				}
