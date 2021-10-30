@@ -338,7 +338,21 @@ Example condition with cloud device:
 }
 ```
 
-### Direct cloud requests
+### Passing dynamic parameters
+
+It's possible to pass dynamic parameter to your scenes and conditions by sending get paramaters in the url.
+
+Example scene with dynamic value:
+```
+"set-tv-volume": 
+{
+	"lr-tv": { "type":"cloud" , "config": "st-rawai" , "actions": "volume" , "values": "{volume}" , "component": "main" }
+}
+```
+Use a get parameter in your call like shown here
+http://address:port/local/scene/{name}/?volume=30
+
+## Direct cloud requests
 
 It's possible to make direct cloud requests to the supported cloud api's if one wishes to. This feauture is useful to retrieve info about the devices, as well as triggering actions that are not supported locally.
 
