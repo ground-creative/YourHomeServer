@@ -143,7 +143,8 @@ Configure scene to be triggered example (acts as a device):
 	"category":"scene"					// special category
 }
 ```
-To trigger scenes, they must be configured as a scene in the file ./config/scenes.json. The following url will trigger your scene http://address:port/local/scene/{sceneName}/
+To trigger scenes, they must be configured as a scene in the file ./config/scenes.json.\ 
+The following url will trigger your scene http://address:port/local/scene/{sceneName}/
 
 ### Scenes configuration
 
@@ -151,14 +152,14 @@ Scenes can trigger actions on multiple devices at once, this is a very powerful 
 
 Scene configuration example (turn on living room lights):
 ```
-"lr-lights-on":
+"your-scene-name":
 {
 	"lr-light1": { "actions": "brightness^temperature^on" , "values": "10^10" } , // use the device label
 	"lr-light2": { "actions": "brightness^temperature^on" , "values": "10^10" } ,
 	"lr-light3": { "actions": "brightness^temperature^on" , "values": "10^10" }
 }
 ```
-Run your scene http://address:port/local/scene/lr-lights-on/
+Run your scene http://address:port/local/scene{sceneName}/
 
 ### Query scene configuration
 
@@ -166,7 +167,7 @@ This feauture allows you to make a request to retrieve values from multiple devi
 
 Example scene query configuration:
 ```
-"air-values":
+"your-scene-name":
 {
 	"lr-ir": { "actions": "info" } ,
 	"mb-ir": { "actions": "info" } , 
@@ -175,12 +176,12 @@ Example scene query configuration:
 ```
 Example scene query configuration with specific values (use ^ as separator):
 ```
-"air-values":
+"your-scene-name":
 {
 	"lr-ir": { "actions": "temp^hum" }
 }
 ```
-Query your scene and get devices data http://address:port/local/query/air-values/
+Query your scene and get devices data http://address:port/local/query/{sceneName}/
 
 ### Conditions configuration
 
@@ -188,7 +189,7 @@ Condition are another powerful feature that can allow you to evaluate the status
 
 Example condition simply returing true or false (using "AND"):
 ```
-"lr-check-lights-off":
+"your-condition-name":
 {
 	"conditions":
 	[
@@ -209,7 +210,7 @@ Example condition simply returing true or false (using "AND"):
 ```
 Example condition using action "then" if condition is true:
 ```
-"br-fan-start-routine":
+"your-condition-name":
 {
 	"conditions":
 	[
@@ -224,9 +225,11 @@ Example condition using action "then" if condition is true:
 	}
 }
 ```
+Evaluate the condition http://address:port/local/eval/{conditionName}/
+
 Example condition using action "then" if condition is true, else if condition is false:
 ```
-"br-fan-start-routine":
+"your-condition-name":
 {
 	"conditions":
 	[
@@ -247,7 +250,7 @@ Example condition using action "then" if condition is true, else if condition is
 ```
 Example condition using "OR" (can be mixed with "AND"):
 ```
-"lr-check-lights-on":
+"your-condition-name":
 {
 	"conditions":
 	[
@@ -357,13 +360,9 @@ http://address:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
 Direct smartthings cloud requests\
 http://address:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{method}/{component?}/{capability?}/
 
-** Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
+** Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings
 
 ## Main endpoints list
-
-Actions are found in the schema file.\
-Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
-Use get-methods for each type as a method to see all the cloud methods available
 
 Run actions on a device\
 http://address:port/local/device/{label}/?actions={actions}&values={values}
@@ -383,6 +382,8 @@ http://address:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
 Direct SmartThings cloud requests\
 http://address:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{method}/{component?}/{capability?}/
 
-
+Actions are found in the schema file.\
+Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
+Use get-methods for each type as a method to see all the cloud methods available
 
 *** Cloud support is not available for Xiaomi devices at the moment.
