@@ -149,8 +149,7 @@ http://address:port/local/scene/{sceneName}/
 
 ### Scenes configuration
 
-Scenes can trigger actions on multiple devices at once, this is a very powerful feature.\
-Configure your scenes in the ./config/scenes.json
+Scenes can trigger actions on multiple devices at once, this is a very powerful feature. Configure your scenes in the ./config/scenes.json
 
 Scene configuration example (turn on living room lights):
 ```
@@ -286,23 +285,23 @@ Example smartthings cloud configuration:
 ```
 "some-config-label":
 {
-	"authToken" : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ,
-	"server": "https://api.smartthings.com/v1/" ,
-	"type": "smartthings"
+	"authToken" 	: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ,
+	"server"		: "https://api.smartthings.com/v1/" ,
+	"type"		: "smartthings"
 }
 ```
 Example tuya cloud configuration:
 ```
 "some-config-label":
 {
-	"secretKey" : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ,
-	"accessKey" : "xxxxxxxxxxxxxxxxx" ,
-	"appKey": "xxxxxxxxxxxxxxxx" ,
-	"homeID": "xxxxxxxxxxxxxx" ,
-	"uid": "xxxxxxxxxxxxxxxxxxxxxx" ,
-	"server": "https://openapi.tuyaus.com" ,
-	"type": "tuya" ,
-	"user_id": "xxxxxxxxxxxxxxxxxxxxx"
+	"secretKey" 	: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ,
+	"accessKey" 	: "xxxxxxxxxxxxxxxxx" ,
+	"appKey"		: "xxxxxxxxxxxxxxxx" ,
+	"homeID"		: "xxxxxxxxxxxxxx" ,
+	"uid"		: "xxxxxxxxxxxxxxxxxxxxxx" ,
+	"server"		: "https://openapi.tuyaus.com" ,
+	"type"		: "tuya" ,
+	"user_id"		: "xxxxxxxxxxxxxxxxxxxxx"
 }
 ```
 Devices can be used as cloud devices for scenes,queries and conditions, with a few added properties.
@@ -317,6 +316,7 @@ Example scene with cloud device:
 {
 	"bhr-fan": { "type":"cloud" , "config": "rawai" , "actions": "countdown_1" , "values": "120" }
 }
+```
 Example condition with cloud device:
 ```
 "turn-off-tv-if-on":
