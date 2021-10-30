@@ -130,9 +130,9 @@ Configure smartthings device example
 	"category":"dj" 
 }
 ```
-Use this endpoint to trigger device actions\
+Use this endpoint to trigger device actions:\
 http://address:port/local/device/lr-light1/?actions={action}&values=&{values} \
-All possible actions are found in the schema file dependiong on the device category
+All possible actions are found in the schema file depending on the device category
 
 Configure scene to be triggered example (acts as a device)
 ```
@@ -143,15 +143,19 @@ Configure scene to be triggered example (acts as a device)
 	"category":"scene"					// special category
 }
 ```
+To trigger scenes, they must be configured as a scene in the file ./config/scenes.json\
+The following url will trigger your scene
+http://address:port/local/scene/{sceneName}/
+
 ### Scenes configuration
 
-scenes can trigger actions on multiple devices at once, this is a very powerful feature.\
+Scenes can trigger actions on multiple devices at once, this is a very powerful feature.\
 Configure your scenes in the ./config/scenes.json
 
 Configure scene example (turn on living room lights):
 
 Scenes can trigger actions on multiple devices at once, this is a ver powerful feature.\
-Configure your scenes in the ./config/scenes.json.
+Configure your scenes in the file ./config/scenes.json.
 
 Scene configuration example (turn on living room lights):
 ```
@@ -168,7 +172,9 @@ http://address:port/local/scene/lr-lights-on/
 ### Query scene configuration
 
 This feauture allows you to make a request to retrieve values from multiple devices at once.\
-Create a scene just like the previous example and use either info as action or specify device fields found in the schema file:
+Create a scene just like the previous example and use either info as action or specify device fields found in the schema file.
+
+Example scene query configuration
 ```
 "air-values":
 {
@@ -177,20 +183,168 @@ Create a scene just like the previous example and use either info as action or s
 	"mb-humidifier": { "actions": "info" }
 }
 ```
+Example scene query configuration with specific values (use ^ as separator)
+```
+"air-values":
+{
+	"lr-ir": { "actions": "temp^hum" }
+}
+```
 Query your scene and get devices data with this ednpoint\
 http://address:port/local/query/air-values/
 
 ### Conditions configuration
 
-Configure your conditions to be evaluated in the ./config/conditions.json
-```
-To do
-```
+Condition are another powerful feature that can allow you to evaluate the status of certain devices and use the actions "then" and "else" depending on the condition result.
 
+Configure your conditions to be evaluated in the ./config/conditions.json
+
+Example condition simply returing true or false (using "AND"):
+```
+"lr-check-lights-off":
+{
+	"conditions":
+	[
+		{
+			"label":"lr-light1" ,
+			"eval": "switch=false"
+		} ,
+		{
+			"label":"lr-light2" ,
+			"eval": "switch=false"
+		} ,
+		{
+			"label":"lr-light3" ,
+			"eval": "switch=false"
+		}
+	] 
+}
+```
+Example condition using action "then" if condition is true:
+```
+"br-fan-start-routine":
+	{
+		"conditions":
+		[
+			{
+				"label":"br-fan" ,
+				"eval": "switch=false"
+			}
+		] ,
+		"then": 
+		{
+			"run": "br-fan-routine"
+		}
+	}
+```
+Example condition using action "then" if condition is true, else if condition is false :
+```
+"br-fan-start-routine":
+{
+	"conditions":
+	[
+		{
+			"label":"br-fan" ,
+			"eval": "switch=false"
+		}
+	] ,
+	"then": 
+	{
+		"run": "some-scene-name"
+	} ,
+	"else":
+	{
+		"run": "some-other-scene-name"
+	}
+}
+```
+Example condition using "OR" (can be mixed with "AND"):
+```
+"lr-check-lights-on":
+{
+	"conditions":
+	[
+		{
+			"label":"lr-light1" ,
+			"eval": "switch=true" ,
+			"or":
+			[
+				{
+					"label":"lr-light2" ,
+					"eval": "switch=true"
+				} ,
+				{
+					"label":"lr-light3" ,
+					"eval": "switch=true"
+				} ,
+				{
+					"label":"st-lamp" ,
+					"eval": "switch=true"
+				}
+			]
+		}
+	] 
+}
+```
 ### Cloud examples
+
+The cloud credentials need to be configured in the file ./config/cloud.json
+
+Example smartthings cloud configuration:
 ```
-To do
+"some-config-label":
+{
+	"authToken" : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ,
+	"server": "https://api.smartthings.com/v1/" ,
+	"type": "smartthings"
+}
 ```
+Example tuya cloud configuration:
+```
+"some-config-label":
+{
+	"secretKey" : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" ,
+	"accessKey" : "xxxxxxxxxxxxxxxxx" ,
+	"appKey": "xxxxxxxxxxxxxxxx" ,
+	"homeID": "xxxxxxxxxxxxxx" ,
+	"uid": "xxxxxxxxxxxxxxxxxxxxxx" ,
+	"server": "https://openapi.tuyaus.com" ,
+	"type": "tuya" ,
+	"user_id": "xxxxxxxxxxxxxxxxxxxxx"
+}
+```
+Devices can be used as cloud devices for scenes,queries and conditions, with a few added properties.
+
+- Type (cloud)
+- Config (the config label from the cloud.json file)
+- Component (only for smartthings)
+
+Example scene with cloud device:
+```
+"bhr-fan-start-countdown":
+{
+	"bhr-fan": { "type":"cloud" , "config": "rawai" , "actions": "countdown_1" , "values": "120" }
+}
+Example condition with cloud device:
+```
+"turn-off-tv-if-on":
+{
+	"conditions":
+	[
+		{
+			"label":"lr-tv" ,
+			"type":"cloud" , 
+			"component": "main" ,
+			"eval": "switch=on" ,
+			"config": "st-rawai"
+		}
+	] ,
+	"then":
+	{
+		"run": "toggle-tv-power"
+	}
+}
+``````
 
 ## Main endpoints
 
