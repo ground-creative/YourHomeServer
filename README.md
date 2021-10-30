@@ -130,8 +130,8 @@ Configure smartthings device example
 	"category":"dj" 
 }
 ```
-Use this endpoint to trigger device actions
-http://address:port/local/device/lr-light1/?actions={action}&values=&{values}
+Use this endpoint to trigger device actions\
+http://address:port/local/device/lr-light1/?actions={action}&values=&{values}\
 All possible actions are found in the schema file dependiong on the device category
 
 Configure scene to be triggered example (acts as a device)
