@@ -100,7 +100,7 @@ Configure custom server parameters in the file ./config/config.json
 ### Device configuration
 Configure your devices and cloud scenes in the file ./config/local/devices.json, categories are found in ./config/local/schemas.json
 
-Configure tuya device example (ip is optional)
+Configure tuya device example (ip is optional):
 ```
 "lr-light1":
 {
@@ -111,7 +111,7 @@ Configure tuya device example (ip is optional)
 	"category":"dj"
 }
 ```
-Configure miio device example
+Configure miio device example:
 ```
 "lr-light1":
 {
@@ -121,7 +121,7 @@ Configure miio device example
 	"category":"dj" 
 }
 ```
-Configure smartthings device example
+Configure smartthings device example:
 ```
 "lr-light1":
 {
@@ -132,9 +132,9 @@ Configure smartthings device example
 ```
 Use this endpoint to trigger device actions:\
 http://address:port/local/device/lr-light1/?actions={action}&values=&{values} \
-All possible actions are found in the schema file depending on the device category
+All possible actions are found in the schema file depending on the device category.
 
-Configure scene to be triggered example (acts as a device)
+Configure scene to be triggered example (acts as a device):
 ```
 "sc-tv-mute-toggle":
 {
@@ -143,7 +143,7 @@ Configure scene to be triggered example (acts as a device)
 	"category":"scene"					// special category
 }
 ```
-To trigger scenes, they must be configured as a scene in the file ./config/scenes.json\
+To trigger scenes, they must be configured as a scene in the file ./config/scenes.json.\
 The following url will trigger your scene
 http://address:port/local/scene/{sceneName}/
 
@@ -151,11 +151,6 @@ http://address:port/local/scene/{sceneName}/
 
 Scenes can trigger actions on multiple devices at once, this is a very powerful feature.\
 Configure your scenes in the ./config/scenes.json
-
-Configure scene example (turn on living room lights):
-
-Scenes can trigger actions on multiple devices at once, this is a ver powerful feature.\
-Configure your scenes in the file ./config/scenes.json.
 
 Scene configuration example (turn on living room lights):
 ```
@@ -166,15 +161,14 @@ Scene configuration example (turn on living room lights):
 	"lr-light3": { "actions": "brightness^temperature^on" , "values": "10^10" }
 }
 ```
-Run your scene\
+Run your scene by calling this endpoint\
 http://address:port/local/scene/lr-lights-on/
 
 ### Query scene configuration
 
-This feauture allows you to make a request to retrieve values from multiple devices at once.\
-Create a scene just like the previous example and use either info as action or specify device fields found in the schema file.
+This feauture allows you to make a request to retrieve values from multiple devices at once. Create a scene just like the previous example and use either info as action or specify device fields found in the schema file.
 
-Example scene query configuration
+Example scene query configuration:
 ```
 "air-values":
 {
@@ -183,7 +177,7 @@ Example scene query configuration
 	"mb-humidifier": { "actions": "info" }
 }
 ```
-Example scene query configuration with specific values (use ^ as separator)
+Example scene query configuration with specific values (use ^ as separator):
 ```
 "air-values":
 {
@@ -195,9 +189,7 @@ http://address:port/local/query/air-values/
 
 ### Conditions configuration
 
-Condition are another powerful feature that can allow you to evaluate the status of certain devices and use the actions "then" and "else" depending on the condition result.
-
-Configure your conditions to be evaluated in the ./config/conditions.json
+Condition are another powerful feature that can allow you to evaluate the status of certain devices and use the actions "then" and "else" depending on the condition result. Configure your conditions to be evaluated in the ./config/conditions.json
 
 Example condition simply returing true or false (using "AND"):
 ```
@@ -223,21 +215,21 @@ Example condition simply returing true or false (using "AND"):
 Example condition using action "then" if condition is true:
 ```
 "br-fan-start-routine":
-	{
-		"conditions":
-		[
-			{
-				"label":"br-fan" ,
-				"eval": "switch=false"
-			}
-		] ,
-		"then": 
+{
+	"conditions":
+	[
 		{
-			"run": "br-fan-routine"
+			"label":"br-fan" ,
+			"eval": "switch=false"
 		}
+	] ,
+	"then": 
+	{
+		"run": "br-fan-routine"
 	}
+}
 ```
-Example condition using action "then" if condition is true, else if condition is false :
+Example condition using action "then" if condition is true, else if condition is false:
 ```
 "br-fan-start-routine":
 {
@@ -315,9 +307,9 @@ Example tuya cloud configuration:
 ```
 Devices can be used as cloud devices for scenes,queries and conditions, with a few added properties.
 
-- Type (cloud)
-- Config (the config label from the cloud.json file)
-- Component (only for smartthings)
+- type (cloud)
+- config (the config label from the cloud.json file)
+- component (the component name, only for smartthings)
 
 Example scene with cloud device:
 ```
@@ -336,7 +328,7 @@ Example condition with cloud device:
 			"type":"cloud" , 
 			"component": "main" ,
 			"eval": "switch=on" ,
-			"config": "st-rawai"
+			"config": "some-cloud-config-label"
 		}
 	] ,
 	"then":
@@ -344,9 +336,21 @@ Example condition with cloud device:
 		"run": "toggle-tv-power"
 	}
 }
-``````
+```
 
-## Main endpoints
+### Direct cloud requests
+
+It's possible to make direct cloud requests to the supported cloud api's if one wishes to. This feauture is useful to retrieve info about the devices, as well as triggering actions that are not supported locally.
+
+Direct tuya cloud requests\
+http://address:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
+
+Direct smartthings cloud requests\
+http://address:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{method}/{component?}/{capability?}/
+
+** Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
+
+## Main endpoints list
 
 Actions are found in the schema file.\
 Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
@@ -372,4 +376,4 @@ http://address:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{met
 
 
 
-*** Cloud support is available for tuya and SmartThings devices at the moment (no cloud Xiaomi support).
+*** Cloud support is not available for Xiaomi devices at the moment.
