@@ -143,9 +143,7 @@ Configure scene to be triggered example (acts as a device):
 	"category":"scene"					// special category
 }
 ```
-To trigger scenes, they must be configured as a scene in the file ./config/scenes.json.\
-The following url will trigger your scene
-http://address:port/local/scene/{sceneName}/
+To trigger scenes, they must be configured as a scene in the file ./config/scenes.json. The following url will trigger your scene http://address:port/local/scene/{sceneName}/
 
 ### Scenes configuration
 
@@ -160,8 +158,7 @@ Scene configuration example (turn on living room lights):
 	"lr-light3": { "actions": "brightness^temperature^on" , "values": "10^10" }
 }
 ```
-Run your scene by calling this endpoint\
-http://address:port/local/scene/lr-lights-on/
+Run your scene http://address:port/local/scene/lr-lights-on/
 
 ### Query scene configuration
 
@@ -183,8 +180,7 @@ Example scene query configuration with specific values (use ^ as separator):
 	"lr-ir": { "actions": "temp^hum" }
 }
 ```
-Query your scene and get devices data with this ednpoint\
-http://address:port/local/query/air-values/
+Query your scene and get devices data http://address:port/local/query/air-values/
 
 ### Conditions configuration
 
@@ -349,8 +345,7 @@ Example scene with dynamic value:
 	"lr-tv": { "type":"cloud" , "config": "st-rawai" , "actions": "volume" , "values": "{volume}" , "component": "main" }
 }
 ```
-Use a get parameter in your call like shown here
-http://address:port/local/scene/{name}/?volume=30
+Use a get parameter in your call http://address:port/local/scene/{name}/?volume=30
 
 ## Direct cloud requests
 
