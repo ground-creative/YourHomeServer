@@ -98,9 +98,7 @@ Configure custom server parameters in the file ./config/config.json
 ```
 
 ### Device configuration
-Configure your devices and cloud scenes in the file ./config/local/devices.json
-
-Device categories are found in ./config/local/schemas.json
+Configure your devices and cloud scenes in the file ./config/local/devices.json, categories are found in ./config/local/schemas.json
 
 Configure tuya device example (ip is optional)
 ```
@@ -132,6 +130,10 @@ Configure smartthings device example
 	"category":"dj" 
 }
 ```
+Use this endpoint to trigger device actions
+http://address:port/local/device/lr-light1/?actions={action}&values=&{values}
+All possible actions are found in the schema file dependiong on the device category
+
 Configure scene to be triggered example (acts as a device)
 ```
 "sc-tv-mute-toggle":
