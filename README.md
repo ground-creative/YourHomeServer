@@ -100,16 +100,36 @@ Configure custom server parameters in the file ./config/config.json
 ### Device configuration
 Configure your devices and cloud scenes in the file ./config/local/devices.json
 
-Configure device example
+Device categories are found in ./config/local/schemas.json
+
+Configure tuya device example (ip is optional)
 ```
 "lr-light1":
 {
-	"id": "XXXXXXXXXXXXXXXXXXX",			// required for tuya and smart things devices, not used for miio devices
-	"key": "XXXXXXXXXXXXXXX" ,			// required for tuya devices only
-	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" ,	// required for miio devices only
-	"ip": "192.168.2.8" ,				// only for local device control tuya and miio , required only for miio devices
-	"type": "tuya" ,				// tuya|miio|smartthings
-	"category":"dj" 				// required, categories are found in ./config/local/schemas.json
+	"id": "XXXXXXXXXXXXXXXXXXX",
+	"key": "XXXXXXXXXXXXXXX" ,
+	"ip": "192.168.2.8" ,
+	"type": "tuya" ,				
+	"category":"dj"
+}
+```
+Configure miio device example
+```
+"lr-light1":
+{
+	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" ,
+	"ip": "192.168.2.8" ,
+	"type": "miio" ,	
+	"category":"dj" 
+}
+```
+Configure smartthings device example
+```
+"lr-light1":
+{
+	"id": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX" ,
+	"type": "smartthings" ,	
+	"category":"dj" 
 }
 ```
 Configure scene to be triggered example (acts as a device)
