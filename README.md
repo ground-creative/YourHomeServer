@@ -377,10 +377,10 @@ Evaluate a condition\
 http://address:port/local/eval/{name}/
 
 Direct tuya cloud requests\
-http://address:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
+http://address:port/cloud/tuya/{type}/{configLabel}/{method}/{deviceID|label?}/
 
 Direct SmartThings cloud requests\
-http://address:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{method}/{component?}/{capability?}/
+http://address:port/cloud/smartthings/{type}/{configLabel}/{method}/{deviceID|label?}/{component?}/{capability?}/
 
 Actions are found in the schema file.\
 Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
