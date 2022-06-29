@@ -355,10 +355,10 @@ Use a get parameter in your call http://address:port/local/scene/{name}/?volume=
 It's possible to make direct cloud requests to the supported cloud api's if one wishes to. This feauture is useful to retrieve info about the devices, as well as triggering actions that are not supported locally.
 
 Direct tuya cloud requests\
-http://address:port/cloud/tuya/{type}/{configLabel}/{deviceID|label}/{method}/
+http://address:port/cloud/tuya/{type}/{configLabel}/{method}/{deviceID|label?}/
 
 Direct smartthings cloud requests\
-http://address:port/cloud/smartthings/{type}/{configLabel}/{deviceID|label}/{method}/{component?}/{capability?}/
+http://address:port/cloud/smartthings/{type}/{configLabel}/{method}/{deviceID|label?}/{component?}/{capability?}/
 
 ** Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings
 
@@ -384,6 +384,6 @@ http://address:port/cloud/smartthings/{type}/{configLabel}/{method}/{deviceID|la
 
 Actions are found in the schema file.\
 Cloud types are "scenes|devices|home|token" for tuya and "devices|apps|subscriptions" for SmartThings\
-Use get-methods for each type as a method to see all the cloud methods available
+Use "get-methods" for each type as a {method} to see all the cloud methods available.
 
 *** Cloud support is not available for Xiaomi devices at the moment.
